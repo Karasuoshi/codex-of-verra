@@ -1,0 +1,87 @@
+{
+ "built": "2026-10-07",
+ "source": "client build 2026-01-20",
+ "sections": [
+  {
+   "id": "items",
+   "title": "Items",
+   "blurb": "Gear, resources, consumables, recipes and quest items, with every known source.",
+   "count": 8921,
+   "count_all": 10011,
+   "shards": 12
+  },
+  {
+   "id": "loot",
+   "title": "Loot tables",
+   "blurb": "Every reward table: rolls, weights, drop chances, subtables and items.",
+   "count": 7441,
+   "count_all": 8197,
+   "shards": 3
+  },
+  {
+   "id": "recipes",
+   "title": "Recipes",
+   "blurb": "Processing and crafting recipes and what they produce. Ingredients are not decoded yet.",
+   "count": 4464,
+   "count_all": 4623,
+   "shards": 1
+  },
+  {
+   "id": "creatures",
+   "title": "Creatures",
+   "blurb": "Monsters, animals and NPCs by name. Loot is shown where the client data links it.",
+   "count": 798,
+   "count_all": 830,
+   "shards": 1
+  },
+  {
+   "id": "quests",
+   "title": "Quests",
+   "blurb": "Quests and story arcs with their texts and item rewards.",
+   "count": 1330,
+   "count_all": 1336,
+   "shards": 1
+  },
+  {
+   "id": "abilities",
+   "title": "Abilities",
+   "blurb": "Archetype, weapon, mount and creature abilities.",
+   "count": 1851,
+   "count_all": 1994,
+   "shards": 1
+  },
+  {
+   "id": "effects",
+   "title": "Status effects",
+   "blurb": "Buffs, debuffs, procs and passives.",
+   "count": 2468,
+   "count_all": 2545,
+   "shards": 1
+  },
+  {
+   "id": "lore",
+   "title": "Lore",
+   "blurb": "Books and chapters found in Verra.",
+   "count": 120,
+   "count_all": 120,
+   "shards": 1
+  },
+  {
+   "id": "places",
+   "title": "Places",
+   "blurb": "Regions, nodes, points of interest and their zone-wide drops.",
+   "count": 448,
+   "count_all": 460,
+   "shards": 1
+  },
+  {
+   "id": "formulas",
+   "title": "Formulas",
+   "blurb": "Named game formulas used for drop chances, quantities, damage and other rules.",
+   "count": 404,
+   "count_all": 404,
+   "shards": 1
+  }
+ ],
+ "xp": true
+}
