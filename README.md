@@ -8,6 +8,7 @@ Static site with no build step. It runs on GitHub Pages as is.
 
 ## What is inside
 - **Items:** every known source. The rule path is shown from the source to the item: loot table → subtable → … with weights, chances and conditions.
+- **Classes:** abilities of the eight archetypes, with older Alpha versions, plus weapon, general, artisan, consumable, siege and creature abilities.
 - **Loot tables:** all 8,197, decoded with rolls, weights, chance formulas and subtables.
 - **Recipes:** what each recipe produces. Ingredients are not decoded yet.
 - **Creatures:** loot where the client data links it.
@@ -31,12 +32,15 @@ Legacy and test records (`zLegacy_`, `Test`, `GM_`, `NOTUSED`…) are hidden by 
 - `data/<section>.json`: list of records for each section; `data/<section>/<n>.json`: full records, split into shards by `crc32(id) % shards`.
 - `data/index.json`: sections, counts and shard numbers; `data/xp.json`: experience curves.
 - `tools/build_site.py`: builds `data/` from the exports.
+- `tools/build_classes.py`: groups abilities by class and kind into `data/classes.json`; run it after `build_site.py`.
+- `data/classes.json`: class pages.
 - `build/`: intermediate inputs used by the build.
 
 ## Rebuild the data
 `data/` is generated from the DesignData exports by `tools/build_site.py`:
 ```
 python3 tools/build_site.py <export-dir>
+python3 tools/build_classes.py
 ```
 
 ## Run locally
@@ -50,6 +54,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
+| 2026-10-08 | Classes: abilities grouped by archetype and kind; status effects in ability texts link to their pages; undecoded numbers shown as labels. | not published |
 | 2026-10-07 | First build: 10 sections, record data split into shards for upload through the GitHub web page, link preview image. | published |
 
 ---

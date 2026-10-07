@@ -176,3 +176,15 @@ tr.cap td { background: rgba(208, 168, 87, 0.12); }
   .plain { columns: 1; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+
+/* classes & ability texts */
+.ph { display: inline-block; font: 500 0.78em/1.4 var(--sans); color: var(--dust); border: 1px dashed var(--gold-dim); border-radius: 3px; padding: 0 5px; margin: 0 1px; white-space: nowrap; cursor: help; }
+.fx { color: var(--gold); font-style: italic; }
+ul.abil { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 10px; }
+ul.abil li { background: var(--slab); border: 1px solid var(--rule); border-left: 3px solid var(--gold-dim); border-radius: 4px; padding: 12px 14px; min-width: 0; }
+ul.abil h3 { margin: 0 0 6px; font-size: 1.02rem; }
+ul.abil .desc { margin: 0; white-space: pre-line; overflow-wrap: anywhere; font: 0.95rem/1.55 var(--sans); font-style: normal; color: var(--parchment); max-width: none; }
+ul.abil p + p { margin-top: 6px; }
+.src-group.legacy { margin-top: 24px; }
+.src-group > ul.abil { padding: 0 10px 12px; }
+@media (min-width: 900px) { ul.abil { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

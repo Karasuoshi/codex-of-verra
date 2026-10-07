@@ -123,11 +123,12 @@
 
   // ——— shell ———
   function buildNav() {
-    const groups = [["Database", ["items", "creatures", "recipes", "loot", "quests", "places"]], ["Combat & lore", ["abilities", "effects", "lore"]], ["Rules", ["formulas"]]];
+    const groups = [["Database", ["items", "creatures", "recipes", "loot", "quests", "places"]], ["Combat & lore", [["classes", "Classes"], "abilities", "effects", "lore"]], ["Rules", ["formulas"]]];
+    const has = (id) => Array.isArray(id) || INDEX.sections.some((x) => x.id === id);
     nav.replaceChildren(
       link("", "Home"),
       ...groups.map(([g, ids]) => [h("span", { class: "nav-group" }, g),
-        ids.filter((id) => INDEX.sections.some((x) => x.id === id)).map((id) => link("db/" + id, section(id).title))]).flat(2),
+        ids.filter(has).map((id) => Array.isArray(id) ? link(id[0], id[1]) : link("db/" + id, section(id).title))]).flat(2),
       INDEX.xp ? link("xp", "Experience") : null);
   }
   function markNav(route) {
@@ -150,7 +151,9 @@
         h("p", { class: "lede" }, "Items, creatures, recipes, loot tables and game formulas, read straight from the Ashes of Creation design data."),
         h("div", { class: "hero-search" }, search, h("button", { type: "button", class: "btn", onclick: () => search.value.trim() && (location.hash = "#/search?q=" + encodeURIComponent(search.value.trim())) }, "Search")),
         h("p", { class: "meta" }, fmt(total) + " entries · " + INDEX.source)),
-      h("ul", { class: "cards" }, INDEX.sections.map((x) => h("li", null, h("a", { href: "#/db/" + x.id, class: "card" },
+      h("ul", { class: "cards" }, h("li", null, h("a", { href: "#/classes", class: "card" },
+        h("span", { class: "card-title" }, "Classes"), h("span", { class: "card-count" }, "8"), h("span", { class: "card-blurb" }, "Tank, Fighter, Rogue, Ranger, Mage, Cleric, Summoner and Bard with their abilities."))),
+        INDEX.sections.map((x) => h("li", null, h("a", { href: "#/db/" + x.id, class: "card" },
         h("span", { class: "card-title" }, x.title), h("span", { class: "card-count" }, fmt(x.count)), h("span", { class: "card-blurb" }, x.blurb))))),
       h("section", { class: "notes" },
         h("h2", null, "About this data"),
@@ -202,11 +205,40 @@
   // ——— record pages ———
   const dl = (pairs) => h("dl", { class: "facts" }, pairs.filter((p) => p[1] != null && p[1] !== "").map(([k, v]) => [h("dt", null, k), h("dd", null, v)]));
   const mono = (t) => h("span", { class: "mono" }, t);
+  // Ability texts carry tokens like $hit1$ or $effect:Status_Riled$ that the game fills in.
+  function phKind(t) {
+    t = t.toLowerCase();
+    if (t.startsWith("cd")) return "cooldown";
+    if (t.startsWith("charges")) return "charges";
+    if (t.includes("dur")) return "duration";
+    if (t.includes("tick")) return "per tick";
+    if (t.includes("statmod")) return "stat bonus";
+    if (t.includes("apply") || t.startsWith("effect")) return "effect";
+    if (/^(hit|linger|init)/.test(t)) return "amount";
+    return "value";
+  }
+  const ph = (kind, tok) => h("span", { class: "ph", title: "Filled in by the game: " + tok + " (not decoded yet)" }, kind);
+  function segNodes(segs) {
+    return segs.map((x) => typeof x === "string" ? x
+      : x.e ? link("db/effects/" + x.e, x.n, "fx")
+      : x.p ? ph(x.p, x.t) : h("span", { class: "fx" }, x.n));
+  }
+  function descText(text) {
+    const out = []; let pos = 0; const re = /\$([^$\s]{1,80})\$/g; let m;
+    while ((m = re.exec(text))) {
+      if (m.index > pos) out.push(text.slice(pos, m.index));
+      const em = /^effect:([A-Za-z0-9_]+)/i.exec(m[1]);
+      out.push(em ? { n: em[1].replace(/^Status_/, "").replace(/_/g, " ") } : { p: phKind(m[1]), t: m[1] });
+      pos = m.index + m[0].length;
+    }
+    if (pos < text.length) out.push(text.slice(pos));
+    return segNodes(out);
+  }
   function header(sec, d, sub) {
     return [h("p", { class: "crumbs" }, link("", "Codex"), " / ", link("db/" + sec, section(sec).title)),
       h("h1", null, d.title || d.name || "Unnamed"), d.dev ? h("p", { class: "warn" }, "Legacy or test record. It may not exist in the live game.") : null,
       sub ? h("p", { class: "sub-head" }, sub) : null,
-      d.description ? h("p", { class: "desc" }, d.description) : null,
+      d.description ? h("p", { class: "desc" }, sec === "abilities" || sec === "effects" ? descText(d.description) : d.description) : null,
       (d.more || []).filter(Boolean).length ? h("div", { class: "more" }, d.more.filter(Boolean).map((t) => h("p", null, t))) : null];
   }
   const linkList = (items, empty) => items && items.length
@@ -240,7 +272,12 @@
       h("p", { class: "small muted" }, "Ingredients and station requirements are not decoded yet.")],
     quests: (d) => [header("quests", d, d.internal), h("h2", null, "Item rewards"), linkList(d.rewards, "No item rewards are linked."), tableLinks(d.reward_tables)],
     places: (d) => [header("places", d, d.kind + " · " + d.internal), h("h2", null, "Drops in this area"), linkList(d.loot, "No area-wide drops."), tableLinks(d.loot_tables)],
-    abilities: (d) => [header("abilities", d, d.internal), h("p", { class: "small muted" }, "Numbers such as $hit1$ are filled in from data that is not decoded yet.")],
+    abilities: (d) => {
+      const cls = CLASS_OF[(d.internal || "").split("_")[0]];
+      return [header("abilities", d, d.internal),
+        cls ? h("p", null, h("span", { class: "tag" }, "Class"), " ", link("classes/" + cls[0], cls[1])) : null,
+        /\$[^$\s]+\$/.test(d.description || "") ? h("p", { class: "small muted" }, "Dotted labels mark numbers and effects the game fills in. They are not decoded yet.") : null];
+    },
     effects: (d) => [header("effects", d, d.internal)],
     lore: (d) => [header("lore", d, d.internal)],
     formulas: (d) => [header("formulas", d), h("pre", { class: "code" }, d.expression || "—")],
@@ -292,6 +329,45 @@
     setPage(d.title || d.name, renderers[sec](d));
   }
 
+  // ——— classes ———
+  const CLASS_OF = { Tank: ["tank", "Tank"], "Tank-A1": ["tank", "Tank"], TankOld: ["tank", "Tank"], Fighter: ["fighter", "Fighter"],
+    Rogue: ["rogue", "Rogue"], "Rogue-old": ["rogue", "Rogue"], Ranger: ["ranger", "Ranger"], "Ranger-Old": ["ranger", "Ranger"], "Ranger-old": ["ranger", "Ranger"],
+    Mage: ["mage", "Mage"], "Mage-A1": ["mage", "Mage"], Cleric: ["cleric", "Cleric"], "Cleric-A1": ["cleric", "Cleric"], ClericOld: ["cleric", "Cleric"],
+    Summoner: ["summoner", "Summoner"], Bard: ["bard", "Bard"] };
+  function abilityCards(list) {
+    return h("ul", { class: "abil" }, list.map((a) => h("li", null,
+      h("h3", null, link("db/abilities/" + a.id, a.n)),
+      a.x ? h("p", { class: "desc" }, segNodes(a.x)) : h("p", { class: "muted small" }, "No description in the data."),
+      a.v ? h("p", { class: "small muted" }, "Other versions: ", a.v.map((id, i) => [i ? ", " : "", link("db/abilities/" + id, "#" + (i + 2))])) : null)));
+  }
+  async function pageClasses(id) {
+    const C = await load("classes.json");
+    const all = [...C.classes, ...C.kinds];
+    const crumbs = h("p", { class: "crumbs" }, link("", "Codex"), id ? [" / ", link("classes", "Classes")] : null);
+    const switcher = h("nav", { class: "tabs", "aria-label": "Classes" }, C.classes.map((c) => h("a", { href: "#/classes/" + c.id, "aria-current": c.id === id ? "page" : null }, c.name)));
+    if (!id) {
+      const card = (c, n) => h("li", null, h("a", { href: "#/classes/" + c.id, class: "card" },
+        h("span", { class: "card-title" }, c.name), h("span", { class: "card-count" }, fmt(n)), h("span", { class: "card-blurb" }, c.blurb)));
+      return setPage("Classes", crumbs, h("h1", null, "Classes"),
+        h("p", { class: "lede small" }, "The eight archetypes and their abilities as they stood in the January 2026 build. Older Alpha versions are kept on each class page."),
+        h("ul", { class: "cards" }, C.classes.map((c) => card(c, c.abilities.length))),
+        h("h2", null, "Other abilities"),
+        h("ul", { class: "cards" }, C.kinds.map((k) => card(k, k.abilities ? k.abilities.length : k.families.reduce((a, f) => a + f.abilities.length, 0)))));
+    }
+    const c = all.find((x) => x.id === id);
+    if (!c) return pageMissing();
+    const isClass = C.classes.includes(c);
+    let body;
+    if (c.families) body = c.families.map((f) => h("details", { class: "src-group" },
+      h("summary", null, h("span", null, f.family), h("span", { class: "count" }, f.abilities.length)), abilityCards(f.abilities)));
+    else body = [abilityCards(c.abilities),
+      c.legacy.length ? h("details", { class: "src-group legacy" },
+        h("summary", null, h("span", null, isClass ? "Alpha and older versions" : "Older versions"), h("span", { class: "count" }, c.legacy.length)),
+        h("p", { class: "small muted" }, "Earlier designs of this kit. They may not exist in the live game."), abilityCards(c.legacy)) : null];
+    setPage(c.name, crumbs, h("h1", null, c.name), isClass ? switcher : null, h("p", { class: "lede small" }, c.blurb),
+      h("p", { class: "small muted" }, "Dotted labels mark numbers and effects the game fills in. They are not decoded yet."), body);
+  }
+
   // ——— experience ———
   async function pageXp(tab) {
     const xp = await load("xp.json");
@@ -330,6 +406,7 @@
       if (!parts.length) await pageHome();
       else if (parts[0] === "search") await pageSearch(q);
       else if (parts[0] === "xp") await pageXp(parts[1]);
+      else if (parts[0] === "classes") await pageClasses(parts[1]);
       else if (parts[0] === "db" && parts.length === 2) await pageList(parts[1], q);
       else if (parts[0] === "db" && parts.length === 3) await pageRecord(parts[1], parts[2]);
       else pageMissing();
