@@ -61,7 +61,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
-| 2026-10-08 | Icons for items, recipes, abilities, status effects and class pages. | not published |
+| 2026-10-08 | Icons for items, recipes, abilities, status effects and class pages. | published |
 | 2026-10-08 | Classes: abilities grouped by archetype and kind; status effects in ability texts link to their pages; undecoded numbers shown as labels. | published |
 | 2026-10-07 | First build: 10 sections, record data split into shards for upload through the GitHub web page, link preview image. | published |
 
