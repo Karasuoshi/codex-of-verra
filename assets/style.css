@@ -200,3 +200,13 @@ ul.abil p + p { margin-top: 6px; }
 @media (max-width: 599px) { .ic.big { width: 56px; height: 56px; } .ic { width: 32px; height: 32px; } }
 .records.with-ic .sub { padding-left: 46px; }
 @media (max-width: 599px) { .records.with-ic .sub { padding-left: 42px; } }
+/* ability numbers */
+.num { color: #f3e7c9; font-weight: 700; }
+.stats { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 2px 0 8px; font-size: 0.85rem; color: var(--dust); }
+.stats .stat b { color: var(--parchment); font-weight: 600; }
+.stats .stat.mana b { color: #8fb8ff; }
+.level-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 14px 0 6px; padding: 10px 12px; background: var(--slab); border: 1px solid var(--rule); border-radius: 4px; }
+.level-pick label { font: 600 0.8rem var(--display); letter-spacing: 0.08em; color: var(--gold); }
+.level-pick input { flex: 1 1 160px; min-width: 120px; accent-color: var(--gold); }
+.level-pick output { min-width: 2ch; font-weight: 700; color: #8fb8ff; }
+

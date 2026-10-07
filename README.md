@@ -40,6 +40,7 @@ Legacy and test records (`zLegacy_`, `Test`, `GM_`, `NOTUSED`…) are hidden by 
 - `tools/iostore.py`, `tools/utexture.py`: read the IoStore table of contents and decode icon textures.
 - `tools/icon_links.py`: links records to icon paths in the design data; `tools/build_icons.py` adds them to `data/`.
 - `build/icon_links.json`, `build/icon_files.json`: record → icon path → file.
+- `tools/dbc_index.py`, `tools/ability_stats.py`: index every design-data row and read ability numbers (mana, cooldown, charges, range, hits). Output `build/ability_stats.json`; `build/mana_curve.json` is the mana-by-level curve.
 - `build/`: intermediate inputs used by the build.
 
 ## Rebuild the data
@@ -61,6 +62,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
+| 2026-10-08 | Ability numbers: mana by character level, cooldown, charges, range and damage or healing percentages on class pages and ability records. | not published |
 | 2026-10-08 | Icons for items, recipes, abilities, status effects and class pages. | published |
 | 2026-10-08 | Classes: abilities grouped by archetype and kind; status effects in ability texts link to their pages; undecoded numbers shown as labels. | published |
 | 2026-10-07 | First build: 10 sections, record data split into shards for upload through the GitHub web page, link preview image. | published |

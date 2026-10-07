@@ -84,31 +84,151 @@ def ph_kind(tok):
     return 'value'
 
 
-def segments(text, effects_by_internal):
-    """Split a description into text and placeholder segments."""
+BUILD = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'build')
+
+
+def jbuild(name, default):
+    p = os.path.join(BUILD, name)
+    if not os.path.exists(p):
+        return default
+    with open(p, encoding='utf-8') as f:
+        return json.load(f)
+
+
+def g(v):
+    return ('%.3f' % v).rstrip('0').rstrip('.')
+
+
+def secs(v):
+    if v >= 60 and v % 60 == 0:
+        return '%d m' % (v // 60)
+    if v >= 60:
+        return '%d m %s s' % (v // 60, g(v % 60))
+    return g(v) + ' s'
+
+
+def elem_label(elem, stat):
+    if stat and stat != 'Health':
+        return None
+    if not elem:
+        return 'damage'
+    if elem == 'Element.Healing':
+        return 'healing power'
+    return elem.split('.')[-1].lower() + ' damage'
+
+
+def amount_text(hit):
+    if not hit:
+        return None
+    for a in hit.get('amounts', []):
+        if a.get('coef') is not None:
+            lab = elem_label(hit.get('elem'), a.get('stat'))
+            if lab:
+                return g(a['coef'] * 100) + '% ' + lab
+    return None
+
+
+def charges_value(ch):
+    if ch is None:
+        return None
+    if isinstance(ch, (int, float)):
+        return int(ch) if ch > 1 else None
+    m = re.search(r'(\d+(?:\.\d+)?)\s*\+\s*(\d+(?:\.\d+)?)\s*\*\s*\w+\s*$', ch)
+    if m and 'GetSkillPurchased' in ch:
+        return '%s (+%s with talent)' % (g(float(m.group(1))), g(float(m.group(2))))
+    return None
+
+
+def stats_of(st):
+    """Compact stats for the reader: m mana base, cd seconds, ch charges, r range m."""
+    if not st:
+        return None
+    out = {}
+    if isinstance(st.get('mana'), (int, float)):
+        out['m'] = st['mana']
+    if isinstance(st.get('cd'), (int, float)) and st['cd'] > 0:
+        out['cd'] = st['cd']
+    ch = charges_value(st.get('charges'))
+    if ch:
+        out['ch'] = ch
+    if isinstance(st.get('range'), (int, float)) and st['range'] > 0:
+        out['r'] = st['range']
+    return out or None
+
+
+SKILL = re.compile(r'\{skill:[^{}]*(?:\{[^{}]*\})?[^{}]*\}')
+TOKEN = re.compile(r'\$([^$\s]{1,80})\$|\{((?:hit|effect|linger|cd|charges)[^{}\s]{0,80})\}')
+
+
+HITS = {}
+
+
+def segments(text, effects_by_internal, st=None, eff_name=None):
+    """Split a description into text and segments: effect links, resolved numbers, markers."""
+    eff_name = eff_name or {}
+    text = SKILL.sub('', text or '').rstrip()
+    hits = (st or {}).get('hits', [])
+    hit_by_name = {h['name']: h for h in hits}
+    ab_effects = (st or {}).get('effects', [])
+
+    def eff_link(gid):
+        if gid in eff_name:
+            return {'e': gid, 'n': eff_name[gid]}
+        return None
+
     out, pos = [], 0
-    for m in re.finditer(r'\$([^$\s]{1,80})\$', text or ''):
+    for m in TOKEN.finditer(text):
         if m.start() > pos:
             out.append(text[pos:m.start()])
-        tok = m.group(1)
+        tok = m.group(1) or m.group(2)
+        seg = None
         em = re.match(r'(?i)effect:([A-Za-z0-9_]+)', tok)
-        if em and em.group(1) in effects_by_internal:
-            gid, name = effects_by_internal[em.group(1)]
-            out.append({'e': gid, 'n': name})
-        elif em:
-            out.append({'n': re.sub(r'^Status_', '', em.group(1)).replace('_', ' ')})
-        else:
-            out.append({'p': ph_kind(tok), 't': tok})
+        hm = re.match(r'(?i)hit(\d+)(?:[.:](.*))?$', tok)
+        hn = re.match(r'(?i)hit:([A-Za-z0-9_]+)(?:[.:](.*))?$', tok)
+        en = re.match(r'(?i)effect(\d+)(?:[.:](.*))?$', tok)
+        if em:
+            if em.group(1) in effects_by_internal:
+                gid, name = effects_by_internal[em.group(1)]
+                seg = {'e': gid, 'n': name}
+            else:
+                seg = {'n': re.sub(r'^Status_', '', em.group(1)).replace('_', ' ')}
+        elif hm or hn:
+            hit = hits[int(hm.group(1)) - 1] if hm and 0 < int(hm.group(1)) <= len(hits) else (
+                (hit_by_name.get(hn.group(1)) or HITS.get(hn.group(1))) if hn else None)
+            sub = (hm or hn).group(2) or ''
+            am = re.match(r'(?i)apply(\d+)(fordur|dur|\.dur)?$', sub)
+            if hit and sub.lower() in ('', 'max', 'min'):
+                v = amount_text(hit)
+                seg = {'v': v} if v else None
+            elif hit and am and int(am.group(1)) < len(hit.get('applies', [])):
+                link = eff_link(hit['applies'][int(am.group(1))])
+                if link and am.group(2) == 'fordur':
+                    out.extend([link, ' for '])
+                    seg = {'p': 'duration', 't': tok}
+                elif link and not am.group(2):
+                    seg = link
+        elif en and en.group(2) in (None, '', 'inline', 'description', 'hide'):
+            k = int(en.group(1)) - 1
+            if 0 <= k < len(ab_effects):
+                seg = eff_link(ab_effects[k])
+        elif tok.lower() == 'charges' and st:
+            ch = charges_value(st.get('charges'))
+            if isinstance(ch, str) and ' (' in ch:
+                seg = {'v': ch.replace(' (', ' charges (', 1)}
+            else:
+                seg = {'v': (str(ch) + ' charges') if ch else '1 charge'}
+        elif tok.lower() == 'cd' and st and isinstance(st.get('cd'), (int, float)):
+            seg = {'v': secs(st['cd'])}
+        out.append(seg or {'p': ph_kind(tok), 't': tok})
         pos = m.end()
-    if pos < len(text or ''):
+    if pos < len(text):
         out.append(text[pos:])
-    # merge neighbouring strings
     merged = []
-    for s in out:
-        if isinstance(s, str) and merged and isinstance(merged[-1], str):
-            merged[-1] += s
+    for s_ in out:
+        if isinstance(s_, str) and merged and isinstance(merged[-1], str):
+            merged[-1] += s_
         else:
-            merged.append(s)
+            merged.append(s_)
     return merged
 
 
@@ -120,6 +240,26 @@ def main():
     for gid, e in effects.items():
         if e.get('internal') and e.get('title'):
             eff_by_internal.setdefault(e['internal'], (gid, e['title']))
+    eff_name = {gid: e['title'] for gid, e in effects.items() if e.get('title')}
+    stats = jbuild('ability_stats.json', {})
+    HITS.update(stats.pop('_hits', {}))
+    curve = jbuild('mana_curve.json', [])
+
+    # numbers and resolved texts on the ability records themselves
+    idx = {s['id']: s for s in load('index.json')['sections']}
+    for i in range(idx['abilities'].get('shards', 1)):
+        p = os.path.join(ROOT, 'abilities', f'{i}.json')
+        sh = load(f'abilities/{i}.json')
+        for gid, rec in sh.items():
+            st = stats.get(gid)
+            sv = stats_of(st)
+            if sv:
+                rec['st'] = sv
+            if rec.get('description'):
+                rec['x'] = segments(rec['description'].strip(), eff_by_internal, st, eff_name)
+        with open(p, 'w', encoding='utf-8') as f:
+            json.dump(sh, f, ensure_ascii=False, separators=(',', ':'))
+        recs.update(sh)
 
     def entries(prefixes):
         rows = [r for r in lst if r['s'] in prefixes and not r.get('d')]
@@ -133,8 +273,11 @@ def main():
                 if desc and desc != first['_desc']:
                     first['v'].append(r['id'])
                 continue
-            by_title[key] = {'id': r['id'], 'n': r['n'], 'i': d.get('internal', ''),
-                             'x': segments(desc, eff_by_internal), 'v': [], '_desc': desc}
+            e = {'id': r['id'], 'n': r['n'], 'i': d.get('internal', ''),
+                 'x': d.get('x') or segments(desc, eff_by_internal), 'v': [], '_desc': desc}
+            if d.get('st'):
+                e['st'] = d['st']
+            by_title[key] = e
         out = list(by_title.values())
         for e in out:
             del e['_desc']
@@ -165,7 +308,7 @@ def main():
                   'blurb': 'Abilities used by monsters and bosses, grouped by creature family.',
                   'families': creatures})
 
-    out = {'classes': classes, 'kinds': kinds}
+    out = {'classes': classes, 'kinds': kinds, 'mana_curve': [v for t, v in curve]}
     with open(os.path.join(ROOT, 'classes.json'), 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
     for c in classes:

@@ -221,6 +221,7 @@
   const ph = (kind, tok) => h("span", { class: "ph", title: "Filled in by the game: " + tok + " (not decoded yet)" }, kind);
   function segNodes(segs) {
     return segs.map((x) => typeof x === "string" ? x
+      : x.v ? h("span", { class: "num" }, x.v)
       : x.e ? link("db/effects/" + x.e, x.n, "fx")
       : x.p ? ph(x.p, x.t) : h("span", { class: "fx" }, x.n));
   }
@@ -239,7 +240,7 @@
     return [h("p", { class: "crumbs" }, link("", "Codex"), " / ", link("db/" + sec, section(sec).title)),
       d.ic ? h("div", { class: "title-row" }, icon(d.ic, "big"), h("h1", null, d.title || d.name || "Unnamed")) : h("h1", null, d.title || d.name || "Unnamed"), d.dev ? h("p", { class: "warn" }, "Legacy or test record. It may not exist in the live game.") : null,
       sub ? h("p", { class: "sub-head" }, sub) : null,
-      d.description ? h("p", { class: "desc" }, sec === "abilities" || sec === "effects" ? descText(d.description) : d.description) : null,
+      d.description ? h("p", { class: "desc" }, d.x ? segNodes(d.x) : sec === "abilities" || sec === "effects" ? descText(d.description) : d.description) : null,
       (d.more || []).filter(Boolean).length ? h("div", { class: "more" }, d.more.filter(Boolean).map((t) => h("p", null, t))) : null];
   }
   const linkList = (items, empty) => items && items.length
@@ -277,6 +278,7 @@
       const cls = CLASS_OF[(d.internal || "").split("_")[0]];
       return [header("abilities", d, d.internal),
         cls ? h("p", null, h("span", { class: "tag" }, "Class"), " ", link("classes/" + cls[0], cls[1])) : null,
+        d.st ? [statLine(d.st), d.st.m != null ? levelPicker() : null] : null,
         /\$[^$\s]+\$/.test(d.description || "") ? h("p", { class: "small muted" }, "Dotted labels mark numbers and effects the game fills in. They are not decoded yet.") : null];
     },
     effects: (d) => [header("effects", d, d.internal)],
@@ -323,11 +325,43 @@
   }
   async function pageRecord(sec, id) {
     if (!renderers[sec]) return pageMissing();
+    if (sec === "abilities" && !CURVE) { try { CURVE = (await load("classes.json")).mana_curve; } catch (e) { /* optional */ } }
     const n = section(sec).shards || 1;
     const shard = await load(sec + "/" + (crc32(String(id)) % n) + ".json");
     const d = shard[id];
     if (!d) return pageMissing();
     setPage(d.title || d.name, renderers[sec](d));
+  }
+
+  // ——— ability numbers ———
+  let LEVEL = 50;
+  try { LEVEL = Math.min(50, Math.max(1, parseInt(localStorage.getItem("cov.level") || "50", 10) || 50)); } catch (e) { /* storage blocked */ }
+  let CURVE = null;
+  const secs = (v) => v >= 60 ? (Math.floor(v / 60) + " m" + (v % 60 ? " " + fmt(+(v % 60).toFixed(2)) + " s" : "")) : fmt(v) + " s";
+  const manaAt = (base, lvl) => CURVE && CURVE[lvl - 1] != null ? Math.ceil(base * CURVE[lvl - 1] / 32) : null;
+  function statLine(st) {
+    if (!st) return null;
+    const parts = [];
+    if (st.m != null) {
+      const v = manaAt(st.m, LEVEL);
+      parts.push(h("span", { class: "stat mana", "data-base": st.m }, h("b", null, v != null ? v : "?"), " mana"));
+    }
+    if (st.cd) parts.push(h("span", { class: "stat" }, h("b", null, secs(st.cd)), " cooldown"));
+    if (st.ch) parts.push(h("span", { class: "stat" }, h("b", null, String(st.ch)), " charges"));
+    if (st.r) parts.push(h("span", { class: "stat" }, h("b", null, fmt(st.r) + " m"), " range"));
+    return parts.length ? h("p", { class: "stats" }, parts) : null;
+  }
+  function levelPicker(onChange) {
+    const out = h("output", { for: "lvl" }, String(LEVEL));
+    const inp = h("input", { type: "range", id: "lvl", min: 1, max: 50, step: 1, value: LEVEL, "aria-label": "Character level" });
+    inp.addEventListener("input", () => {
+      LEVEL = +inp.value; out.textContent = String(LEVEL);
+      try { localStorage.setItem("cov.level", String(LEVEL)); } catch (e) { /* ignore */ }
+      document.querySelectorAll(".stat.mana").forEach((el) => { el.firstChild.textContent = manaAt(+el.dataset.base, LEVEL); });
+      if (onChange) onChange();
+    });
+    return h("div", { class: "level-pick" }, h("label", { for: "lvl" }, "Character level"), inp, out,
+      h("span", { class: "small muted" }, "Mana cost scales with level."));
   }
 
   // ——— classes ———
@@ -338,11 +372,13 @@
   function abilityCards(list) {
     return h("ul", { class: "abil" }, list.map((a) => h("li", null,
       h("h3", null, link("db/abilities/" + a.id, [icon(a.ic, "sm"), a.n])),
+      statLine(a.st),
       a.x ? h("p", { class: "desc" }, segNodes(a.x)) : h("p", { class: "muted small" }, "No description in the data."),
       a.v ? h("p", { class: "small muted" }, "Other versions: ", a.v.map((id, i) => [i ? ", " : "", link("db/abilities/" + id, "#" + (i + 2))])) : null)));
   }
   async function pageClasses(id) {
     const C = await load("classes.json");
+    CURVE = C.mana_curve || CURVE;
     const all = [...C.classes, ...C.kinds];
     const crumbs = h("p", { class: "crumbs" }, link("", "Codex"), id ? [" / ", link("classes", "Classes")] : null);
     const switcher = h("nav", { class: "tabs", "aria-label": "Classes" }, C.classes.map((c) => h("a", { href: "#/classes/" + c.id, "aria-current": c.id === id ? "page" : null }, c.name)));
@@ -366,7 +402,8 @@
         h("summary", null, h("span", null, isClass ? "Alpha and older versions" : "Older versions"), h("span", { class: "count" }, c.legacy.length)),
         h("p", { class: "small muted" }, "Earlier designs of this kit. They may not exist in the live game."), abilityCards(c.legacy)) : null];
     setPage(c.name, crumbs, h("h1", null, c.name), isClass ? switcher : null, h("p", { class: "lede small" }, c.blurb),
-      h("p", { class: "small muted" }, "Dotted labels mark numbers and effects the game fills in. They are not decoded yet."), body);
+      isClass ? levelPicker() : null,
+      h("p", { class: "small muted" }, "Numbers come from the design data. Cast times are not in it yet; dotted labels mark values still being decoded."), body);
   }
 
   // ——— experience ———
