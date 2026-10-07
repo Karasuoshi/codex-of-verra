@@ -50,7 +50,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
-| 2026-10-07 | First build: 10 sections, record data split into shards for upload through the GitHub web page, link preview image. | not published |
+| 2026-10-07 | First build: 10 sections, record data split into shards for upload through the GitHub web page, link preview image. | published |
 
 ---
 Independent, non-commercial fan project. Not affiliated with or endorsed by Intrepid Studios. Ashes of Creation is a trademark of its owner.
