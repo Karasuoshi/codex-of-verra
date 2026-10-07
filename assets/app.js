@@ -40,6 +40,7 @@
     return cache.get(path);
   }
   const link = (to, text, cls) => h("a", { href: "#/" + to, class: cls }, text);
+  const icon = (src, cls) => src ? h("img", { src, alt: "", class: "ic" + (cls ? " " + cls : ""), loading: "lazy", decoding: "async" }) : null;
   const section = (id) => INDEX.sections.find((x) => x.id === id) || { id, title: id };
 
   // Legacy and test records are hidden unless the reader turns them on.
@@ -165,7 +166,7 @@
 
   // ——— lists ———
   function listView(rows, opts) {
-    const ul = h("ul", { class: "records" });
+    const ul = h("ul", { class: opts.icons ? "records with-ic" : "records" });
     const counter = h("span", { class: "count", "aria-live": "polite" });
     const q = h("input", { type: "search", id: "list-search", placeholder: opts.placeholder || "Filter by name or internal name", "aria-label": "Filter", value: opts.q || "" });
     const dev = h("input", { type: "checkbox", id: "list-dev", checked: showDev });
@@ -176,7 +177,7 @@
         words.every((w) => (r.n || "").toLowerCase().includes(w) || (r.q || "").includes(w) || (r.s || "").toLowerCase().includes(w)));
       const shown = hits.slice(0, 400);
       ul.replaceChildren(...(shown.length ? shown.map((r) => h("li", null, h("a", { href: "#/" + (r.sec || opts.sec) + "/" + encodeURIComponent(r.id), class: r.d ? "dev" : null },
-        h("span", { class: "name" }, r.n || "Unnamed"), r.d ? h("span", { class: "tag" }, "legacy/test") : null,
+        h("span", { class: "name" }, opts.icons ? (r.ic ? icon(r.ic) : h("span", { class: "ic none", "aria-hidden": "true" })) : null, h("span", null, r.n || "Unnamed")), r.d ? h("span", { class: "tag" }, "legacy/test") : null,
         h("span", { class: "sub" }, (r.secTitle ? r.secTitle + " · " : "") + (r.s || "")))))
         : [h("li", { class: "empty" }, "Nothing matches. Try part of a name, an internal name like Gear_Armor, or turn on legacy entries.")]));
       counter.textContent = fmt(hits.length) + (hits.length > shown.length ? " found, first " + shown.length + " shown" : " found");
@@ -195,11 +196,11 @@
     const rows = await load(sec + ".json");
     const extra = { items: "Has a known source", creatures: "Has known loot", places: "Has drops" }[sec];
     setPage(meta.title, h("p", { class: "crumbs" }, link("", "Codex")), h("h1", null, meta.title), h("p", { class: "lede small" }, meta.blurb),
-      listView(rows, { sec: "db/" + sec, q, hasSourceLabel: extra }));
+      listView(rows, { sec: "db/" + sec, q, hasSourceLabel: extra, icons: ["items", "abilities", "effects", "recipes"].includes(sec) }));
   }
   async function pageSearch(q) {
     const all = await Promise.all(INDEX.sections.map((x) => load(x.id + ".json").then((rows) => rows.map((r) => ({ ...r, sec: "db/" + x.id, secTitle: x.title })))));
-    setPage("Search", h("p", { class: "crumbs" }, link("", "Codex")), h("h1", null, "Search"), listView(all.flat(), { q, placeholder: "Search everything" }));
+    setPage("Search", h("p", { class: "crumbs" }, link("", "Codex")), h("h1", null, "Search"), listView(all.flat(), { q, placeholder: "Search everything", icons: true }));
   }
 
   // ——— record pages ———
@@ -236,13 +237,13 @@
   }
   function header(sec, d, sub) {
     return [h("p", { class: "crumbs" }, link("", "Codex"), " / ", link("db/" + sec, section(sec).title)),
-      h("h1", null, d.title || d.name || "Unnamed"), d.dev ? h("p", { class: "warn" }, "Legacy or test record. It may not exist in the live game.") : null,
+      d.ic ? h("div", { class: "title-row" }, icon(d.ic, "big"), h("h1", null, d.title || d.name || "Unnamed")) : h("h1", null, d.title || d.name || "Unnamed"), d.dev ? h("p", { class: "warn" }, "Legacy or test record. It may not exist in the live game.") : null,
       sub ? h("p", { class: "sub-head" }, sub) : null,
       d.description ? h("p", { class: "desc" }, sec === "abilities" || sec === "effects" ? descText(d.description) : d.description) : null,
       (d.more || []).filter(Boolean).length ? h("div", { class: "more" }, d.more.filter(Boolean).map((t) => h("p", null, t))) : null];
   }
   const linkList = (items, empty) => items && items.length
-    ? h("ul", { class: "chips" }, items.map((i) => h("li", null, i.link ? link(i.link.replace(/^(\w+)\//, "db/$1/"), i.name || "Unnamed") : i.name)))
+    ? h("ul", { class: "chips" }, items.map((i) => h("li", null, i.link ? link(i.link.replace(/^(\w+)\//, "db/$1/"), [icon(i.ic, "sm"), i.name || "Unnamed"]) : i.name)))
     : h("p", { class: "muted" }, empty);
   const tableLinks = (names) => names && names.length ? h("p", { class: "small muted" }, "Loot tables: ", names.map((n, i) => [i ? ", " : "", h("a", { href: "#/search?q=" + encodeURIComponent(n) }, n)])) : null;
 
@@ -294,7 +295,7 @@
       kids.push(h("div", { class: "roll" }, h("h3", null, "Roll " + (ci + 1), h("span", { class: "rule" }, c.selection), c.number_to_select ? h("span", { class: "note" }, "pick " + c.number_to_select) : null),
         c.predicate ? h("p", { class: "cond" }, "Only if ", mono(c.predicate)) : null,
         h("ul", { class: "rewards" }, c.rewards.map((r, i) => h("li", null,
-          (r.items || []).map((it) => h("div", null, link("db/items/" + it.item.guid, it.item.item || it.item.internal_name || it.item.guid), h("span", { class: "qty" }, "× " + it.quantity))),
+          (r.items || []).map((it) => h("div", null, link("db/items/" + it.item.guid, [icon(it.item.ic, "sm"), it.item.item || it.item.internal_name || it.item.guid]), h("span", { class: "qty" }, "× " + it.quantity))),
           (r.currency || []).map((cu) => h("div", null, "Currency ", h("span", { class: "qty" }, cu.amount))),
           (r.experience || []).map((x) => h("div", { class: "muted" }, x.type + " XP ", h("span", { class: "qty" }, x.value))),
           c.weights && c.weights[i] != null ? h("span", { class: "note" }, "weight " + c.weights[i] + "/" + total) : null,
@@ -336,7 +337,7 @@
     Summoner: ["summoner", "Summoner"], Bard: ["bard", "Bard"] };
   function abilityCards(list) {
     return h("ul", { class: "abil" }, list.map((a) => h("li", null,
-      h("h3", null, link("db/abilities/" + a.id, a.n)),
+      h("h3", null, link("db/abilities/" + a.id, [icon(a.ic, "sm"), a.n])),
       a.x ? h("p", { class: "desc" }, segNodes(a.x)) : h("p", { class: "muted small" }, "No description in the data."),
       a.v ? h("p", { class: "small muted" }, "Other versions: ", a.v.map((id, i) => [i ? ", " : "", link("db/abilities/" + id, "#" + (i + 2))])) : null)));
   }

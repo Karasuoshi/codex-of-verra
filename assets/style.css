@@ -105,7 +105,8 @@ input::placeholder { color: #7c766a; }
 .records a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; padding: 9px 6px; text-decoration: none; color: var(--parchment); }
 .records a:hover { background: var(--slab); }
 .records a.dev { opacity: 0.6; }
-.records .name { font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
+.records .name { font-weight: 500; min-width: 0; overflow-wrap: anywhere; display: flex; align-items: center; gap: 10px; }
+.records .name > span:last-child { min-width: 0; }
 .records .sub { grid-column: 1 / -1; color: var(--dust); font-size: 0.85rem; overflow-wrap: anywhere; }
 .records .empty { padding: 14px 6px; color: var(--dust); }
 .tag { font: 600 0.68rem var(--sans); letter-spacing: 0.05em; text-transform: uppercase; color: var(--dust); border: 1px solid var(--rule); border-radius: 3px; padding: 1px 5px; align-self: center; }
@@ -188,3 +189,14 @@ ul.abil p + p { margin-top: 6px; }
 .src-group.legacy { margin-top: 24px; }
 .src-group > ul.abil { padding: 0 10px 12px; }
 @media (min-width: 900px) { ul.abil { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* icons */
+.ic { width: 36px; height: 36px; flex: none; object-fit: contain; border-radius: 4px; background: #0d0e11; border: 1px solid var(--rule); vertical-align: middle; }
+.ic.none { display: inline-block; background: transparent; border-style: dashed; opacity: 0.35; }
+.ic.sm { width: 22px; height: 22px; margin-right: 6px; border-radius: 3px; vertical-align: -6px; }
+.ic.big { width: 72px; height: 72px; border-radius: 6px; border-color: var(--gold-dim); box-shadow: 0 0 0 3px rgba(208, 168, 87, 0.08); }
+.title-row { display: flex; align-items: center; gap: 16px; min-width: 0; }
+.title-row h1 { min-width: 0; overflow-wrap: anywhere; }
+.chips a .ic.sm { margin-right: 6px; }
+@media (max-width: 599px) { .ic.big { width: 56px; height: 56px; } .ic { width: 32px; height: 32px; } }
+.records.with-ic .sub { padding-left: 46px; }
+@media (max-width: 599px) { .records.with-ic .sub { padding-left: 42px; } }

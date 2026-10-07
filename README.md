@@ -17,10 +17,11 @@ Static site with no build step. It runs on GitHub Pages as is.
 - **Formulas:** the game's named formulas as source text.
 - **Experience:** XP curves for character, artisan skills, weapons and guilds.
 
+**Icons:** 3,621 item, ability, status effect and building icons in `icons/` (WebP, up to 128 px), taken from the game's own unencrypted `pakchunk0` container.
+
 Legacy and test records (`zLegacy_`, `Test`, `GM_`, `NOTUSED`…) are hidden by default and can be shown in any list.
 
 ## Known gaps
-- Item icons live in encrypted game archives and are not included.
 - Most creature-specific loot tables are not linked to creatures in the client data, so creature drops are incomplete.
 - Recipe ingredients, item stats and enchantments are the next decoding steps.
 
@@ -34,6 +35,11 @@ Legacy and test records (`zLegacy_`, `Test`, `GM_`, `NOTUSED`…) are hidden by 
 - `tools/build_site.py`: builds `data/` from the exports.
 - `tools/build_classes.py`: groups abilities by class and kind into `data/classes.json`; run it after `build_site.py`.
 - `data/classes.json`: class pages.
+- `icons/`: icons by game folder (`Items/`, `Resource/`, `Abilities/`, `StatusEffects/`…).
+- `tools/extract_icons.ps1`: copies icon packages out of `pakchunk0` on Windows (byte ranges from `icon_list.tsv`).
+- `tools/iostore.py`, `tools/utexture.py`: read the IoStore table of contents and decode icon textures.
+- `tools/icon_links.py`: links records to icon paths in the design data; `tools/build_icons.py` adds them to `data/`.
+- `build/icon_links.json`, `build/icon_files.json`: record → icon path → file.
 - `build/`: intermediate inputs used by the build.
 
 ## Rebuild the data
@@ -41,6 +47,7 @@ Legacy and test records (`zLegacy_`, `Test`, `GM_`, `NOTUSED`…) are hidden by 
 ```
 python3 tools/build_site.py <export-dir>
 python3 tools/build_classes.py
+python3 tools/build_icons.py
 ```
 
 ## Run locally
@@ -54,6 +61,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
+| 2026-10-08 | Icons for items, recipes, abilities, status effects and class pages. | not published |
 | 2026-10-08 | Classes: abilities grouped by archetype and kind; status effects in ability texts link to their pages; undecoded numbers shown as labels. | published |
 | 2026-10-07 | First build: 10 sections, record data split into shards for upload through the GitHub web page, link preview image. | published |
 
