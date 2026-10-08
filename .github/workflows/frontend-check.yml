@@ -1,0 +1,20 @@
+name: Frontend smoke checks
+on:
+  pull_request:
+  push:
+    branches:
+      - feature/skill-tree-screen-layouts
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check frontend and all skill trees
+        run: node tools/check_frontend.mjs
+      - name: Install browser test runner
+        run: npm install --no-save playwright@1.58.2 && npx playwright install --with-deps chromium
+      - name: Browser smoke checks
+        run: node tools/check_browser.mjs
