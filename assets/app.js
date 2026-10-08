@@ -124,7 +124,7 @@
 
   // ——— shell ———
   function buildNav() {
-    const groups = [["Database", ["items", "creatures", "recipes", "loot", "quests", "places"]], ["Combat & lore", [["classes", "Classes"], "abilities", "effects", "lore"]], ["Rules", ["formulas"]]];
+    const groups = [["Database", ["items", "creatures", "recipes", "loot", "quests", "places"]], ["Combat & lore", [["skills", "Skill trees"], ["classes", "Classes"], "abilities", "effects", "lore"]], ["Rules", ["formulas"]]];
     const has = (id) => Array.isArray(id) || INDEX.sections.some((x) => x.id === id);
     nav.replaceChildren(
       link("", "Home"),
@@ -221,7 +221,7 @@
   const ph = (kind, tok) => h("span", { class: "ph", title: "Filled in by the game: " + tok + " (not decoded yet)" }, kind);
   function segNodes(segs) {
     return segs.map((x) => typeof x === "string" ? x
-      : x.v ? h("span", { class: "num" }, x.v)
+      : x.v ? h("span", { class: /healing/.test(x.v) ? "num heal" : "num" }, x.v)
       : x.e ? link("db/effects/" + x.e, x.n, "fx")
       : x.p ? ph(x.p, x.t) : h("span", { class: "fx" }, x.n));
   }
@@ -406,6 +406,107 @@
       h("p", { class: "small muted" }, "Numbers come from the design data. Cast times are not in it yet; dotted labels mark values still being decoded."), body);
   }
 
+  // ——— skill trees (in-game style panel) ———
+  const STEP = 84, ROWH = 96, PADX = 48, PADY = 44, TIERGAP = 34;
+  function tipBody(d) {
+    const kids = [];
+    const st = d.st;
+    if (st) {
+      const left = [], right = [];
+      if (st.m != null) left.push(h("div", { class: "tt-mana" }, h("span", { class: "stat mana", "data-base": st.m }, manaAt(st.m, LEVEL)), " Mana"));
+      if (st.r) left.push(h("div", null, fmt(st.r) + "m Range"));
+      if (st.cd) right.push(h("div", null, secs(st.cd).replace(/ /g, "") + " cooldown"));
+      if (st.ch) right.push(h("div", null, String(st.ch) + " Charges"));
+      if (left.length || right.length) kids.push(h("div", { class: "tt-stats" }, h("div", null, left), h("div", { class: "tt-right" }, right)));
+    }
+    if (d.x) kids.push(h("p", { class: "tt-desc" }, segNodes(d.x)));
+    return kids;
+  }
+  function tooltip(d) {
+    const opts = d.opts ? d.opts.map((o) => h("div", { class: "tt-opt" }, h("div", { class: "tt-opt-name" }, icon(o.ic, "sm"), o.n), tipBody(o))) : null;
+    return h("div", { class: "tt", role: "tooltip" },
+      h("div", { class: "tt-head" }, d.k === "c" ? "Choose one" : d.n),
+      h("div", { class: "tt-body" }, d.k === "c" ? opts : tipBody(d),
+        d.c || d.pt ? h("div", { class: "tt-cost" }, "Cost: " + (d.c || 1) + " ", h("span", { class: "pt-sq" }), " " + (d.pt || "Skill Pt.")) : null,
+        d.l ? h("div", { class: "tt-link" }, link("db/" + d.l, "Open in the codex →")) : null));
+  }
+  async function pageSkills(id) {
+    const idx = await load("trees.json");
+    const list = idx.trees;
+    id = list.some((t) => t.id === id) ? id : "fighter";
+    const T = await load("trees/" + id + ".json");
+    try { CURVE = CURVE || (await load("classes.json")).mana_curve; } catch (e) { /* optional */ }
+    const group = T.group;
+    const tabs = h("div", { class: "st-tabs", role: "tablist" }, ["Archetype", "Weapon", "Stamina"].map((g) => {
+      const first = list.find((t) => t.group === g);
+      return h("a", { href: "#/skills/" + (g === group ? id : first.id), class: "st-tab", "aria-current": g === group ? "page" : null }, g);
+    }));
+    const subs = group === "Stamina" ? null : h("div", { class: "st-sub" }, list.filter((t) => t.group === group).map((t) =>
+      h("a", { href: "#/skills/" + t.id, class: "st-chip", "aria-current": t.id === id ? "page" : null }, icon(t.ic, "sm"), t.name)));
+    // geometry
+    let y = PADY, prevT = null, maxX = 0;
+    const place = {}, tiers = [];
+    T.rows.forEach((r) => {
+      if (prevT !== null && r.t !== prevT) { y += TIERGAP; tiers.push(y - TIERGAP / 2 - ROWH / 2 + 26); }
+      r.nodes.forEach(([k, x]) => { place[k] = [PADX + x * STEP, y]; maxX = Math.max(maxX, x); });
+      y += ROWH; prevT = r.t;
+    });
+    const W = PADX * 2 + maxX * STEP, H = y - ROWH + PADY + 40;
+    const svg = s("svg", { class: "st-lines", width: W, height: H, viewBox: `0 0 ${W} ${H}`, "aria-hidden": "true" });
+    const defs = s("defs"); const mk = s("marker", { id: "st-arrow", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" });
+    mk.append(s("path", { d: "M0 0 L10 5 L0 10 z", class: "st-arrowhead" })); defs.append(mk); svg.append(defs);
+    T.nodes.forEach((d, k) => (d.pre || []).forEach((p) => {
+      if (!place[p] || !place[k]) return;
+      const [x1, y1] = place[p], [x2, y2] = place[k];
+      const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1, r1 = 30, r2 = 32;
+      svg.append(s("line", { x1: x1 + dx / len * r1, y1: y1 + dy / len * r1, x2: x2 - dx / len * r2, y2: y2 - dy / len * r2, class: "st-edge", "marker-end": "url(#st-arrow)" }));
+    }));
+    const tierMarks = tiers.map((ty) => h("div", { class: "st-tier", style: `top:${ty}px` }));
+    let pinned = null;
+    const tipHost = h("div", { class: "st-tiphost" });
+    const showTip = (btn, d, pin) => {
+      tipHost.replaceChildren(tooltip(d));
+      tipHost.classList.add("on");
+      const box = btn.getBoundingClientRect(), wrap = stage.getBoundingClientRect();
+      const narrow = window.innerWidth < 700;
+      tipHost.classList.toggle("dock", narrow);
+      if (!narrow) {
+        let left = box.right - wrap.left + 12; const tw = 340;
+        if (box.right + 12 + tw > window.innerWidth - 8) left = box.left - wrap.left - 12 - tw;
+        tipHost.style.left = Math.max(4, left) + "px";
+        tipHost.style.top = Math.max(4, box.top - wrap.top - 10) + "px";
+      } else { tipHost.style.left = ""; tipHost.style.top = ""; }
+      if (pin) pinned = btn;
+    };
+    const hideTip = () => { tipHost.classList.remove("on"); pinned = null; };
+    const nodesEl = T.nodes.map((d, k) => {
+      if (!place[k]) return null;
+      const [x, yy] = place[k];
+      const b = h("button", { type: "button", class: "st-node " + (d.k === "a" ? "act" : d.k === "c" ? "choice" : "pas"), style: `left:${x}px;top:${yy}px`, "aria-label": d.n },
+        d.ic ? h("img", { src: d.ic, alt: "", loading: "lazy" }) : h("span", { class: "st-noicon" }, (d.n || "?").slice(0, 1)),
+        d.c && d.c > 1 ? h("span", { class: "st-cost" }, d.c) : null,
+        d.k === "c" ? h("span", { class: "st-choice" }, "◆") : null);
+      const hoverable = () => window.matchMedia("(hover: hover)").matches && window.innerWidth >= 700;
+      b.addEventListener("mouseenter", () => { if (!pinned && hoverable()) showTip(b, d); });
+      b.addEventListener("mouseleave", () => { if (!pinned && hoverable()) hideTip(); });
+      b.addEventListener("focus", () => { if (hoverable() && !pinned) showTip(b, d); });
+      b.addEventListener("click", (e) => { e.stopPropagation(); if (pinned === b) hideTip(); else showTip(b, d, true); });
+      return b;
+    });
+    const canvas = h("div", { class: "st-canvas", style: `width:${W}px;height:${H}px` }, svg, tierMarks, nodesEl);
+    const stage = h("div", { class: "st-stage" + (T.bg ? " has-bg" : ""), style: T.bg ? `background-image:linear-gradient(90deg, rgba(10,10,14,.9) 0%, rgba(10,10,14,.5) 55%, rgba(10,10,14,.15) 100%), url("${T.bg}")` : null }, h("div", { class: "st-scroll" }, canvas), tipHost);
+    stage.addEventListener("click", () => hideTip());
+    tipHost.addEventListener("click", (e) => e.stopPropagation());
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") hideTip(); });
+    const win = h("section", { class: "st-window", "aria-label": "Skill tree" },
+      h("header", { class: "st-head" }, h("span", { class: "st-title" }, "Skill Tree"), h("kbd", null, "K"), h("span", { class: "st-name" }, T.name)),
+      tabs, subs, stage,
+      h("footer", { class: "st-foot" }, levelPicker(), h("span", { class: "small muted" }, "Hover or tap a node. Arrows show what unlocks what.")));
+    setPage(T.name + " skill tree", h("p", { class: "crumbs" }, link("", "Codex"), " / ", link("skills", "Skill trees")), h("h1", null, "Skill trees"),
+      h("p", { class: "lede small" }, "The archetype, weapon and stamina trees as they are laid out in the game data: nodes, unlock order and point costs. Exact node positions live in the game interface, so the layout here follows the unlock chains."),
+      win);
+  }
+
   // ——— experience ———
   async function pageXp(tab) {
     const xp = await load("xp.json");
@@ -445,6 +546,7 @@
       else if (parts[0] === "search") await pageSearch(q);
       else if (parts[0] === "xp") await pageXp(parts[1]);
       else if (parts[0] === "classes") await pageClasses(parts[1]);
+      else if (parts[0] === "skills") await pageSkills(parts[1]);
       else if (parts[0] === "db" && parts.length === 2) await pageList(parts[1], q);
       else if (parts[0] === "db" && parts.length === 3) await pageRecord(parts[1], parts[2]);
       else pageMissing();

@@ -40,6 +40,8 @@ Legacy and test records (`zLegacy_`, `Test`, `GM_`, `NOTUSED`…) are hidden by 
 - `tools/iostore.py`, `tools/utexture.py`: read the IoStore table of contents and decode icon textures.
 - `tools/icon_links.py`: links records to icon paths in the design data; `tools/build_icons.py` adds them to `data/`.
 - `build/icon_links.json`, `build/icon_files.json`: record → icon path → file.
+- `tools/skill_trees.py` → `build/skill_trees.json`: tree nodes, prerequisites, tiers and point costs; `tools/build_trees.py` → `data/trees.json`, `data/trees/<id>.json` (layout and tooltips).
+- `art/`: tree backgrounds and node frames from `pakchunk0_s2` (`tools/extract_ui.ps1`, list `ui_list.tsv`).
 - `tools/dbc_index.py`, `tools/ability_stats.py`: index every design-data row and read ability numbers (mana, cooldown, charges, range, hits). Output `build/ability_stats.json`; `build/mana_curve.json` is the mana-by-level curve.
 - `build/`: intermediate inputs used by the build.
 
@@ -49,6 +51,7 @@ Legacy and test records (`zLegacy_`, `Test`, `GM_`, `NOTUSED`…) are hidden by 
 python3 tools/build_site.py <export-dir>
 python3 tools/build_classes.py
 python3 tools/build_icons.py
+python3 tools/build_trees.py
 ```
 
 ## Run locally
@@ -62,6 +65,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
+| 2026-10-08 | Skill trees in the in-game panel style: archetype, weapon and stamina trees with the game's own backgrounds and node frames, unlock arrows, point costs and tooltips. | not published |
 | 2026-10-08 | Ability numbers: mana by character level, cooldown, charges, range and damage or healing percentages on class pages and ability records. | not published |
 | 2026-10-08 | Icons for items, recipes, abilities, status effects and class pages. | published |
 | 2026-10-08 | Classes: abilities grouped by archetype and kind; status effects in ability texts link to their pages; undecoded numbers shown as labels. | published |
