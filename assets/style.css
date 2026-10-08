@@ -306,3 +306,18 @@ ul.abil p + p { margin-top: 6px; }
 .wip b { color: var(--gold); }
 .hero-search input:disabled, .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .card.soon:hover { border-color: var(--rule); background: var(--slab); }
+
+
+/* Community improvement proposals */
+.idea-card { margin: 24px 0; padding: 25px; border: 1px solid var(--rule); border-radius: 6px; background: var(--slab); }
+.idea-card h2 { margin: 0 0 12px; color: var(--gold); }
+.idea-card p { max-width: 72ch; line-height: 1.65; }
+.idea-more { display: inline-flex; align-items: center; justify-content: center; min-width: 190px; margin-top: 14px; padding: 12px 25px; border-radius: 4px; background: var(--gold); color: #17191e; text-decoration: none; font: 700 .85rem var(--sans); letter-spacing: .09em; }
+.idea-more:hover, .idea-more:focus-visible { background: #ebc575; color: #111; }
+.idea-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin: 22px 0 16px; border-bottom: 1px solid var(--rule); }
+.idea-tabs button { cursor: pointer; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--dust); padding: 11px 13px; font: .9rem var(--sans); }
+.idea-tabs button[aria-selected="true"] { color: var(--gold); border-bottom-color: var(--gold); background: var(--slab); }
+.idea-panel { padding: 18px 20px; margin: 12px 0; border: 1px solid var(--rule); border-radius: 5px; background: var(--slab); }
+.idea-panel h2 { margin: 0 0 9px; font-size: 1.15rem; color: var(--gold); }
+.idea-panel p { margin: 0; line-height: 1.7; }
+@media (max-width: 600px) { .idea-card { padding: 18px; } .idea-more { width: 100%; } .idea-tabs button { flex: 1 1 auto; padding: 10px 8px; } .idea-panel { padding: 15px; } }
