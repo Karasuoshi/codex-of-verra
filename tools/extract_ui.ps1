@@ -1,6 +1,6 @@
 # Codex of Verra: copy skill tree textures out of the game's own pakchunk0_s2 container.
 # The container in this build is not encrypted or compressed, so this only reads
-# byte ranges listed in icon_list.tsv. Nothing in the game folder is changed.
+# byte ranges listed in ui_list.tsv. Nothing in the game folder is changed.
 # Output: parts_ui\ui_001.zip, ui_002.zip ... (about 4.5 MB each) next to this script.
 
 $ErrorActionPreference = 'Stop'

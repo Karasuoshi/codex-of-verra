@@ -1,0 +1,23 @@
+Discordance	Bard	mana=9	range=30m	cooldown=15s	cast=1.3s	damage=50% arcane x3 notes	applies=Staggered	charlevel=2	shot=2026-10-08 02:25
+Gambit	Bard	mana=12	range=30m	cooldown=60s	cast=0.7s	min_health=25%	applies=Solace	charlevel=2	shot=2026-10-08 02:26
+Saga	Bard	mana=20	cooldown=90s	cast=3.1s	Apocalypse: 150% fire dmg + Burning + Volatile; zone 30% fire dmg/s + Unquenchable Flames, 8s	ReturnToVerra: 3 bursts, up to 8 allies, 100% healing power, Glee/Pep	SilentPantheon: up to 8 allies, Blessing of the Pantheon, mana = 100% dmg, 8s	MythOfCreation: 7 stacks Resonance	charlevel=2	shot=2026-10-08 02:26
+Mesmerizing Dance	Bard	mana=9	range=5m	cooldown=25s	cast=0.7s	applies=Incapacitated 10s; Staggered targets -> Stunned 3s	charlevel=2
+Cheerful Melody	Bard	range=30m	cast=2s	channel=20s+	melody: +15% healing received, heal 15% healing power every 2s	charlevel=2
+Avert Your Gaze	Bard passive	Maddening Dance ticks apply Shaken; final tick applies Humiliated	charlevel=2
+EFFECT Shaken	Phys Defense -15% for 6s, extendable up to 15s by reapplication
+EFFECT Humiliated	Damage dealt -15% to targets other than applier, 8s
+EFFECT Incapacitated	Cannot move or act, breaks on damage
+EFFECT Stunned	Cannot move or act
+WEAPON Weapon Proc Duration I	Scepter tree	+15% duration of all weapon proc effects	cost 1 weapon pt	weaponlevel=2
+WEAPON Extended Finisher Damage II	Scepter tree	Extended Finisher & Deadly Extended Finisher damage +3%	cost 1
+WEAPON Unstoppable	Scepter tree	Deadly Finishers & Deadly Extended Finishers: +15% Physical Penetration for 5s	cost 2
+WEAPON Weighted Followthrough III	Scepter tree	Finisher, Deadly Finisher, Extended Finisher, Deadly Extended Finisher damage +1% and Penetration +5%	cost 1
+STAMINA Recuperation	regain 5 stamina on successful dodge	cost 2 stamina pts
+STAMINA Escape Velocity	+1% movement speed every second while sprinting in combat	cost 2
+STAMINA Empowered Guard	when guarding, Physical and Magical Block Mitigation contribute 25% to blocked attacks of the opposite type	cost 3
+Flash Cure	Cleric	mana=10	range=30m	cooldown=6s	charges=3	cast=instant	heal 175% healing power, usable during other activations	charlevel=1
+Divine Retribution	Cleric passive	Divine Flare deals 250% radiant dmg and applies Silenced in area on detonation, split per target	charlevel=1
+EFFECT Silenced	Cannot use abilities, 4s
+Wings of Salvation	Cleric	mana=9	range=30m	cooldown=30s	cast=1.4s	dash to ally, grants Wings of Salvation to caster and target	charlevel=1
+Mend	Cleric	mana=3	range=30m	cooldown=3s	charges=3	cast=0.7s	heal 150% healing power on arrival	charlevel=1
+Smite	Cleric	mana=5	range=30m	cooldown=10s	cast=1.2s	150% radiant dmg; no cast time in melee range; Burning -> Conflagrating	charlevel=1

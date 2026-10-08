@@ -53,3 +53,11 @@ class DB:
                 if x is not None and abs(v - x) < tol:
                     out.append((p - a, x))
         return out
+
+
+if __name__ == '__main__':
+    # python3 tools/dbc_index.py <CacheDB.dbc> <db.pkl>  (index used by ability_stats, skill_trees, mana_curve)
+    import pickle
+    from dbc_index import DB as _DB  # pickle the class under its module name, not __main__
+    pickle.dump(_DB(sys.argv[1]), open(sys.argv[2], 'wb'), protocol=pickle.HIGHEST_PROTOCOL)
+    print('indexed', sys.argv[1])

@@ -4,6 +4,8 @@ A fan-made database for **Ashes of Creation**: items, creatures, recipes, loot t
 
 Static site with no build step. It runs on GitHub Pages as is.
 
+**Want to help?** Read [`AGENTS.md`](AGENTS.md) first. It is the full project guide, for people and for AI assistants (Claude, ChatGPT / Codex, Cursor, Copilot…): rules, data format, how to rebuild, open tasks.
+
 **Address:** https://karasuoshi.github.io/codex-of-verra/
 
 ## What is inside
@@ -44,14 +46,17 @@ Legacy and test records (`zLegacy_`, `Test`, `GM_`, `NOTUSED`…) are hidden by 
 - `art/`: tree backgrounds and node frames from `pakchunk0_s2` (`tools/extract_ui.ps1`, list `ui_list.tsv`).
 - `tools/dbc_index.py`, `tools/ability_stats.py`: index every design-data row and read ability numbers (mana, cooldown, charges, range, hits). Output `build/ability_stats.json`; `build/mana_curve.json` is the mana-by-level curve.
 - `build/`: intermediate inputs used by the build.
+- `tools/build_all.sh`: runs the whole pipeline in order; `tools/check_samples.py` checks ability numbers against `docs/samples/`.
+- `tools/dbc_text.py`, `tools/dbc_rows.py`: read the design-data file (tables, string pool, row boundaries); `tools/export_texts.py` + `tools/build_dataset.py`: English texts by record; `tools/loot.py` + `tools/drops.py`: loot tables and who drops what; `tools/mana_curve.py`: mana by level.
+- `tools/pak_list.py`: lists files and byte ranges of an IoStore container; `tools/convert_icons.py`: turns the extracted zips into WebP icons.
+- `AGENTS.md` (+ `CLAUDE.md`, `.github/copilot-instructions.md`): guide for contributors and AI assistants.
+- `docs/samples/`: in-game tooltip values used for verification.
 
 ## Rebuild the data
-`data/` is generated from the DesignData exports by `tools/build_site.py`:
+Everything in `data/` and `build/` is generated from the game's `CacheDB.dbc` with one command (details in `AGENTS.md`, section 5):
 ```
-python3 tools/build_site.py <export-dir>
-python3 tools/build_classes.py
-python3 tools/build_icons.py
-python3 tools/build_trees.py
+tools/build_all.sh /path/to/CacheDB.dbc
+python3 tools/check_samples.py   # decoded numbers vs in-game tooltips
 ```
 
 ## Run locally
@@ -65,6 +70,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
+| 2026-10-08 | Contributor guide (`AGENTS.md`) for people and AI assistants; all extractors in `tools/` with a one-command rebuild (`build_all.sh`) and a check against in-game tooltips. Loot data now shows names of curves and items in place of raw ids (loot section is still locked). | draft |
 | 2026-10-08 | Skill tree planner in the game's look (learn, Respec, shareable build link). Only Classes, Skill trees and Experience are open; other sections show as coming soon. Work-in-progress note on the home page. | published |
 | 2026-10-08 | Skill trees in the in-game panel style: archetype, weapon and stamina trees with the game's own backgrounds and node frames, unlock arrows, point costs and tooltips. | published |
 | 2026-10-08 | Ability numbers: mana by character level, cooldown, charges, range and damage or healing percentages on class pages and ability records. | published |
