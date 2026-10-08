@@ -39,7 +39,11 @@
     }
     return cache.get(path);
   }
-  const link = (to, text, cls) => h("a", { href: "#/" + to, class: cls }, text);
+  // Only these parts of the codex are open for now; everything else is shown but not clickable.
+  const OPEN = /^(|classes(\/.*)?|skills(\/.*)?|xp(\/.*)?)$/;
+  const isOpen = (to) => OPEN.test(String(to).split("?")[0]);
+  const link = (to, text, cls) => isOpen(to) ? h("a", { href: "#/" + to, class: cls }, text)
+    : h("span", { class: "locked" + (cls ? " " + cls : ""), title: "Coming soon" }, text);
   const icon = (src, cls) => src ? h("img", { src, alt: "", class: "ic" + (cls ? " " + cls : ""), loading: "lazy", decoding: "async" }) : null;
   const section = (id) => INDEX.sections.find((x) => x.id === id) || { id, title: id };
 
@@ -124,13 +128,13 @@
 
   // ——— shell ———
   function buildNav() {
-    const groups = [["Database", ["items", "creatures", "recipes", "loot", "quests", "places"]], ["Combat & lore", [["skills", "Skill trees"], ["classes", "Classes"], "abilities", "effects", "lore"]], ["Rules", ["formulas"]]];
+    const groups = [["Classes & skills", [["classes", "Classes"], ["skills", "Skill trees"], ["xp", "Experience"]]],
+      ["Coming soon", ["items", "creatures", "recipes", "loot", "quests", "places", "abilities", "effects", "lore", "formulas"]]];
     const has = (id) => Array.isArray(id) || INDEX.sections.some((x) => x.id === id);
     nav.replaceChildren(
       link("", "Home"),
       ...groups.map(([g, ids]) => [h("span", { class: "nav-group" }, g),
-        ids.filter(has).map((id) => Array.isArray(id) ? link(id[0], id[1]) : link("db/" + id, section(id).title))]).flat(2),
-      INDEX.xp ? link("xp", "Experience") : null);
+        ids.filter(has).map((id) => Array.isArray(id) ? link(id[0], id[1]) : h("span", { class: "nav-soon", title: "Coming soon" }, section(id).title))]).flat(2));
   }
   function markNav(route) {
     nav.querySelectorAll("a").forEach((a) => {
@@ -143,25 +147,29 @@
   // ——— home ———
   async function pageHome() {
     const total = INDEX.sections.reduce((a, b) => a + b.count, 0);
-    const search = h("input", { type: "search", id: "home-search", placeholder: "Search items, creatures, recipes…", "aria-label": "Search the codex",
-      onkeydown: (e) => { if (e.key === "Enter" && e.target.value.trim()) location.hash = "#/search?q=" + encodeURIComponent(e.target.value.trim()); } });
+    const search = h("input", { type: "search", id: "home-search", placeholder: "Search opens soon", "aria-label": "Search the codex", disabled: true });
     setPage("",
       h("section", { class: "hero" },
         h("p", { class: "hero-kicker" }, "A field guide to the world of Verra"),
         h("h1", null, "Codex of Verra"),
         h("p", { class: "lede" }, "Items, creatures, recipes, loot tables and game formulas, read straight from the Ashes of Creation design data."),
-        h("div", { class: "hero-search" }, search, h("button", { type: "button", class: "btn", onclick: () => search.value.trim() && (location.hash = "#/search?q=" + encodeURIComponent(search.value.trim())) }, "Search")),
+        h("div", { class: "wip", role: "status" }, h("b", null, "Work in progress."), " The codex is being built. More information will appear here soon."),
+        h("div", { class: "hero-search" }, search, h("button", { type: "button", class: "btn", disabled: true }, "Search")),
         h("p", { class: "meta" }, fmt(total) + " entries · " + INDEX.source)),
-      h("ul", { class: "cards" }, h("li", null, h("a", { href: "#/classes", class: "card" },
-        h("span", { class: "card-title" }, "Classes"), h("span", { class: "card-count" }, "8"), h("span", { class: "card-blurb" }, "Tank, Fighter, Rogue, Ranger, Mage, Cleric, Summoner and Bard with their abilities."))),
-        INDEX.sections.map((x) => h("li", null, h("a", { href: "#/db/" + x.id, class: "card" },
-        h("span", { class: "card-title" }, x.title), h("span", { class: "card-count" }, fmt(x.count)), h("span", { class: "card-blurb" }, x.blurb))))),
+      h("ul", { class: "cards" },
+        h("li", null, h("a", { href: "#/classes", class: "card" },
+          h("span", { class: "card-title" }, "Classes"), h("span", { class: "card-count" }, "8"), h("span", { class: "card-blurb" }, "Tank, Fighter, Rogue, Ranger, Mage, Cleric, Summoner and Bard with their abilities."))),
+        h("li", null, h("a", { href: "#/skills", class: "card" },
+          h("span", { class: "card-title" }, "Skill trees"), h("span", { class: "card-count" }, "23"), h("span", { class: "card-blurb" }, "Archetype, weapon and stamina trees in the in-game style. Plan a build and share it."))),
+        INDEX.xp ? h("li", null, h("a", { href: "#/xp", class: "card" },
+          h("span", { class: "card-title" }, "Experience"), h("span", { class: "card-count" }, "XP"), h("span", { class: "card-blurb" }, "Experience curves for character, artisan skills, weapons and guilds."))) : null,
+        INDEX.sections.map((x) => h("li", null, h("div", { class: "card soon", "aria-disabled": "true" },
+          h("span", { class: "card-title" }, x.title), h("span", { class: "card-count" }, "Soon"), h("span", { class: "card-blurb" }, x.blurb))))),
       h("section", { class: "notes" },
         h("h2", null, "About this data"),
         h("p", null, "Everything here comes from the design-data cache that shipped with the last Early Access client (January 2026). Drop sources are shown where the data links them: quests, recipes, gathering, events, containers, zones, points of interest and some creatures."),
         h("p", null, "Most creature-specific loot tables are not linked to their creatures in the client data, so creature drops are incomplete until we confirm them in game. Legacy and test records are hidden by default; turn them on in any list.")),
       h("footer", { class: "foot" }, "Codex of Verra is an independent, non-commercial fan project. It is not affiliated with or endorsed by Intrepid Studios. Ashes of Creation is a trademark of its owner."));
-    search.focus();
   }
 
   // ——— lists ———
@@ -387,11 +395,9 @@
         h("span", { class: "card-title" }, c.name), h("span", { class: "card-count" }, fmt(n)), h("span", { class: "card-blurb" }, c.blurb)));
       return setPage("Classes", crumbs, h("h1", null, "Classes"),
         h("p", { class: "lede small" }, "The eight archetypes and their abilities as they stood in the January 2026 build. Older Alpha versions are kept on each class page."),
-        h("ul", { class: "cards" }, C.classes.map((c) => card(c, c.abilities.length))),
-        h("h2", null, "Other abilities"),
-        h("ul", { class: "cards" }, C.kinds.map((k) => card(k, k.abilities ? k.abilities.length : k.families.reduce((a, f) => a + f.abilities.length, 0)))));
+        h("ul", { class: "cards" }, C.classes.map((c) => card(c, c.abilities.length))));
     }
-    const c = all.find((x) => x.id === id);
+    const c = C.classes.find((x) => x.id === id);
     if (!c) return pageMissing();
     const isClass = C.classes.includes(c);
     let body;
@@ -407,7 +413,7 @@
   }
 
   // ——— skill trees (in-game style panel) ———
-  const STEP = 84, ROWH = 96, PADX = 48, PADY = 44, TIERGAP = 34;
+  const STEP = 52, ROWH = 64, PADX = 34, PADY = 34, TIERGAP = 18;
   function tipBody(d) {
     const kids = [];
     const st = d.st;
@@ -422,13 +428,8 @@
     if (d.x) kids.push(h("p", { class: "tt-desc" }, segNodes(d.x)));
     return kids;
   }
-  function tooltip(d) {
-    const opts = d.opts ? d.opts.map((o) => h("div", { class: "tt-opt" }, h("div", { class: "tt-opt-name" }, icon(o.ic, "sm"), o.n), tipBody(o))) : null;
-    return h("div", { class: "tt", role: "tooltip" },
-      h("div", { class: "tt-head" }, d.k === "c" ? "Choose one" : d.n),
-      h("div", { class: "tt-body" }, d.k === "c" ? opts : tipBody(d),
-        d.c || d.pt ? h("div", { class: "tt-cost" }, "Cost: " + (d.c || 1) + " ", h("span", { class: "pt-sq" }), " " + (d.pt || "Skill Pt.")) : null,
-        d.l ? h("div", { class: "tt-link" }, link("db/" + d.l, "Open in the codex →")) : null));
+  function costLine(d) {
+    return d.c || d.pt ? h("div", { class: "tt-cost" }, "Cost: " + (d.c || 1) + " ", h("span", { class: "pt-sq" }), " " + ((d.c || 1) > 1 ? (d.pt || "Skill Pt.").replace(/Pt\.$/, "Pts.") : (d.pt || "Skill Pt."))) : null;
   }
   async function pageSkills(id) {
     const idx = await load("trees.json");
@@ -436,75 +437,141 @@
     id = list.some((t) => t.id === id) ? id : "fighter";
     const T = await load("trees/" + id + ".json");
     try { CURVE = CURVE || (await load("classes.json")).mana_curve; } catch (e) { /* optional */ }
+    const N = T.nodes;
+    // build state from the address: ?b=3.5.7c1
+    const params = new URLSearchParams((location.hash.split("?")[1]) || "");
+    const learned = new Set(), chosen = new Map();
+    (params.get("b") || "").split(".").filter(Boolean).forEach((t) => {
+      const m = /^(\d+)(?:c(\d+))?$/.exec(t); if (!m || !N[+m[1]]) return;
+      learned.add(+m[1]); if (m[2] != null) chosen.set(+m[1], +m[2]);
+    });
+    const kids = N.map(() => []);
+    N.forEach((d, k) => (d.pre || []).forEach((p) => kids[p] && kids[p].push(k)));
+    const avail = (k) => (N[k].pre || []).every((p) => learned.has(p));
+    const cost = (k) => { const d = N[k].k === "c" && chosen.has(k) ? N[k].opts[chosen.get(k)] : N[k]; return d.c || N[k].c || 1; };
+    const ptName = N.find((d) => d.pt) ? N.find((d) => d.pt).pt.replace(/ Pt\.$/, "") : "Skill";
+    const unlearn = (k) => { learned.delete(k); chosen.delete(k); kids[k].forEach((c) => learned.has(c) && unlearn(c)); };
+    const view = (k) => (N[k].k === "c" && chosen.has(k) ? N[k].opts[chosen.get(k)] : N[k]);
+
     const group = T.group;
     const tabs = h("div", { class: "st-tabs", role: "tablist" }, ["Archetype", "Weapon", "Stamina"].map((g) => {
       const first = list.find((t) => t.group === g);
-      return h("a", { href: "#/skills/" + (g === group ? id : first.id), class: "st-tab", "aria-current": g === group ? "page" : null }, g);
-    }));
+      return h("a", { href: "#/skills/" + (g === group ? id : first.id), class: "st-tab", "aria-current": g === group ? "page" : null }, g, g === "Archetype" ? h("span", { class: "st-dia" }, "◆") : null);
+    }), h("span", { class: "st-tab off", title: "Coming soon" }, "Skill Book"));
     const subs = group === "Stamina" ? null : h("div", { class: "st-sub" }, list.filter((t) => t.group === group).map((t) =>
       h("a", { href: "#/skills/" + t.id, class: "st-chip", "aria-current": t.id === id ? "page" : null }, icon(t.ic, "sm"), t.name)));
     // geometry
     let y = PADY, prevT = null, maxX = 0;
     const place = {}, tiers = [];
     T.rows.forEach((r) => {
-      if (prevT !== null && r.t !== prevT) { y += TIERGAP; tiers.push(y - TIERGAP / 2 - ROWH / 2 + 26); }
+      if (prevT !== null && r.t !== prevT) { y += TIERGAP; tiers.push(y - TIERGAP / 2 - ROWH / 2 + 4); }
       r.nodes.forEach(([k, x]) => { place[k] = [PADX + x * STEP, y]; maxX = Math.max(maxX, x); });
       y += ROWH; prevT = r.t;
     });
-    const W = PADX * 2 + maxX * STEP, H = y - ROWH + PADY + 40;
+    const W = PADX * 2 + maxX * STEP, H = y - ROWH + PADY + 10;
     const svg = s("svg", { class: "st-lines", width: W, height: H, viewBox: `0 0 ${W} ${H}`, "aria-hidden": "true" });
-    const defs = s("defs"); const mk = s("marker", { id: "st-arrow", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" });
+    const defs = s("defs"); const mk = s("marker", { id: "st-arrow", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 5, markerHeight: 5, orient: "auto-start-reverse" });
     mk.append(s("path", { d: "M0 0 L10 5 L0 10 z", class: "st-arrowhead" })); defs.append(mk); svg.append(defs);
-    T.nodes.forEach((d, k) => (d.pre || []).forEach((p) => {
+    const edges = [];
+    N.forEach((d, k) => (d.pre || []).forEach((p) => {
       if (!place[p] || !place[k]) return;
       const [x1, y1] = place[p], [x2, y2] = place[k];
-      const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1, r1 = 30, r2 = 32;
-      svg.append(s("line", { x1: x1 + dx / len * r1, y1: y1 + dy / len * r1, x2: x2 - dx / len * r2, y2: y2 - dy / len * r2, class: "st-edge", "marker-end": "url(#st-arrow)" }));
+      const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1, r1 = 22, r2 = 23;
+      const ln = s("line", { x1: x1 + dx / len * r1, y1: y1 + dy / len * r1, x2: x2 - dx / len * r2, y2: y2 - dy / len * r2, class: "st-edge", "marker-end": "url(#st-arrow)" });
+      edges.push([p, ln]); svg.append(ln);
     }));
     const tierMarks = tiers.map((ty) => h("div", { class: "st-tier", style: `top:${ty}px` }));
+    // tooltip
     let pinned = null;
     const tipHost = h("div", { class: "st-tiphost" });
-    const showTip = (btn, d, pin) => {
-      tipHost.replaceChildren(tooltip(d));
+    const hoverable = () => window.matchMedia("(hover: hover)").matches && window.innerWidth >= 700;
+    function tooltip(k) {
+      const d = N[k], v = view(k);
+      const isL = learned.has(k), ok = avail(k);
+      const action = !ok ? h("div", { class: "tt-hint warn" }, "Requires: " + d.pre.filter((p) => !learned.has(p)).map((p) => view(p).n).join(", "))
+        : d.k === "c" && !isL ? h("div", { class: "tt-hint" }, "Choose one option to learn it.")
+        : h("div", { class: "tt-actions" }, h("button", { type: "button", class: "tt-btn", onclick: (e) => { e.stopPropagation(); toggle(k); } }, isL ? "Unlearn" : "Learn"),
+            hoverable() ? h("span", { class: "tt-hint" }, "or click the node") : null);
+      const opts = d.k === "c" ? d.opts.map((o, i) => h("div", { class: "tt-opt" + (chosen.get(k) === i ? " on" : "") },
+        h("div", { class: "tt-opt-name" }, icon(o.ic, "sm"), o.n), tipBody(o),
+        ok ? h("button", { type: "button", class: "tt-btn", onclick: (e) => { e.stopPropagation(); chosen.set(k, i); learned.add(k); refresh(); showTip(nodeEls[k], k, true); } }, chosen.get(k) === i ? "Chosen" : "Choose") : null)) : null;
+      return h("div", { class: "tt", role: "tooltip" },
+        h("div", { class: "tt-head" }, d.k === "c" && !chosen.has(k) ? "Choose one" : v.n),
+        h("div", { class: "tt-body" }, d.k === "c" && !chosen.has(k) ? opts : [tipBody(v), d.k === "c" ? h("details", { class: "tt-more" }, h("summary", null, "Other options"), opts) : null],
+          costLine(v.c ? v : d), action,
+          v.l && isOpen(v.l) ? h("div", { class: "tt-link" }, link(v.l, "Open in the codex →")) : null));
+    }
+    function showTip(btn, k, pin) {
+      tipHost.replaceChildren(tooltip(k));
       tipHost.classList.add("on");
-      const box = btn.getBoundingClientRect(), wrap = stage.getBoundingClientRect();
-      const narrow = window.innerWidth < 700;
+      const narrow = !hoverable();
       tipHost.classList.toggle("dock", narrow);
       if (!narrow) {
-        let left = box.right - wrap.left + 12; const tw = 340;
-        if (box.right + 12 + tw > window.innerWidth - 8) left = box.left - wrap.left - 12 - tw;
+        const box = btn.getBoundingClientRect(), wrap = stage.getBoundingClientRect();
+        let left = box.right - wrap.left + 10; const tw = 330;
+        if (box.right + 10 + tw > window.innerWidth - 8) left = box.left - wrap.left - 10 - tw;
         tipHost.style.left = Math.max(4, left) + "px";
-        tipHost.style.top = Math.max(4, box.top - wrap.top - 10) + "px";
+        tipHost.style.top = Math.max(4, Math.min(box.top - wrap.top - 8, wrap.height - 40)) + "px";
       } else { tipHost.style.left = ""; tipHost.style.top = ""; }
-      if (pin) pinned = btn;
-    };
+      pinned = pin ? btn : null;
+    }
     const hideTip = () => { tipHost.classList.remove("on"); pinned = null; };
-    const nodesEl = T.nodes.map((d, k) => {
+    function toggle(k) {
+      if (learned.has(k)) unlearn(k);
+      else if (avail(k)) { if (N[k].k === "c" && !chosen.has(k)) { showTip(nodeEls[k], k, true); return; } learned.add(k); }
+      refresh();
+      if (tipHost.classList.contains("on")) showTip(nodeEls[k], k, !!pinned);
+    }
+    const nodeEls = N.map((d, k) => {
       if (!place[k]) return null;
       const [x, yy] = place[k];
-      const b = h("button", { type: "button", class: "st-node " + (d.k === "a" ? "act" : d.k === "c" ? "choice" : "pas"), style: `left:${x}px;top:${yy}px`, "aria-label": d.n },
-        d.ic ? h("img", { src: d.ic, alt: "", loading: "lazy" }) : h("span", { class: "st-noicon" }, (d.n || "?").slice(0, 1)),
-        d.c && d.c > 1 ? h("span", { class: "st-cost" }, d.c) : null,
-        d.k === "c" ? h("span", { class: "st-choice" }, "◆") : null);
-      const hoverable = () => window.matchMedia("(hover: hover)").matches && window.innerWidth >= 700;
-      b.addEventListener("mouseenter", () => { if (!pinned && hoverable()) showTip(b, d); });
+      const b = h("button", { type: "button", class: "st-node " + (d.k === "a" ? "act" : d.k === "c" ? "choice" + (d.opts[0] && d.opts[0].k === "p" ? " pas" : "") : "pas"), style: `left:${x}px;top:${yy}px`, "aria-label": d.n });
+      b.addEventListener("mouseenter", () => { if (!pinned && hoverable()) showTip(b, k); });
       b.addEventListener("mouseleave", () => { if (!pinned && hoverable()) hideTip(); });
-      b.addEventListener("focus", () => { if (hoverable() && !pinned) showTip(b, d); });
-      b.addEventListener("click", (e) => { e.stopPropagation(); if (pinned === b) hideTip(); else showTip(b, d, true); });
+      b.addEventListener("click", (e) => { e.stopPropagation(); if (hoverable()) toggle(k); else if (pinned === b) hideTip(); else showTip(b, k, true); });
       return b;
     });
-    const canvas = h("div", { class: "st-canvas", style: `width:${W}px;height:${H}px` }, svg, tierMarks, nodesEl);
-    const stage = h("div", { class: "st-stage" + (T.bg ? " has-bg" : ""), style: T.bg ? `background-image:linear-gradient(90deg, rgba(10,10,14,.9) 0%, rgba(10,10,14,.5) 55%, rgba(10,10,14,.15) 100%), url("${T.bg}")` : null }, h("div", { class: "st-scroll" }, canvas), tipHost);
+    const spentEl = h("b"), linkBtn = h("button", { type: "button", class: "st-btn primary" }, "Confirm Choices");
+    function refresh() {
+      nodeEls.forEach((b, k) => {
+        if (!b) return;
+        const d = N[k], v = view(k), isL = learned.has(k), ok = avail(k);
+        b.classList.toggle("learned", isL); b.classList.toggle("unavail", !isL && !ok);
+        const showIc = d.k === "c" && !chosen.has(k) ? null : v.ic;
+        b.replaceChildren(showIc ? h("img", { src: showIc, alt: "", loading: "lazy" }) : d.k === "c" ? h("span", { class: "st-plus" }) : h("span", { class: "st-noicon" }, (v.n || "?").slice(0, 1)),
+          (v.c || d.c) > 1 ? h("span", { class: "st-cost" }, v.c || d.c) : null);
+        b.setAttribute("aria-pressed", isL ? "true" : "false");
+      });
+      edges.forEach(([p, ln]) => ln.classList.toggle("on", learned.has(p)));
+      let pts = 0; learned.forEach((k) => { pts += cost(k); });
+      spentEl.textContent = String(pts);
+      const code = [...learned].sort((a, b) => a - b).map((k) => k + (chosen.has(k) ? "c" + chosen.get(k) : "")).join(".");
+      history.replaceState(null, "", "#/skills/" + id + (code ? "?b=" + code : ""));
+    }
+    const canvas = h("div", { class: "st-canvas", style: `width:${W}px;height:${H}px` }, svg, tierMarks, nodeEls);
+    const stage = h("div", { class: "st-stage" + (T.bg ? " has-bg" : ""), style: T.bg ? `background-image:linear-gradient(90deg, rgba(8,8,12,.55) 0%, rgba(8,8,12,.25) 60%, rgba(8,8,12,0) 100%), url("${T.bg}")` : null },
+      h("div", { class: "st-scroll" }, canvas), tipHost);
     stage.addEventListener("click", () => hideTip());
     tipHost.addEventListener("click", (e) => e.stopPropagation());
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") hideTip(); });
+    const note = h("span", { class: "st-note", "aria-live": "polite" });
+    linkBtn.addEventListener("click", async () => {
+      const url = location.href;
+      try { await navigator.clipboard.writeText(url); note.textContent = "Build link copied."; } catch (e) { note.textContent = "Copy the address bar to share this build."; }
+    });
     const win = h("section", { class: "st-window", "aria-label": "Skill tree" },
-      h("header", { class: "st-head" }, h("span", { class: "st-title" }, "Skill Tree"), h("kbd", null, "K"), h("span", { class: "st-name" }, T.name)),
+      h("header", { class: "st-head" }, h("span", { class: "st-emblem", "aria-hidden": "true" }), h("span", { class: "st-title" }, "Skill Tree"), h("kbd", null, "K"),
+        h("span", { class: "st-name" }, T.name)),
       tabs, subs, stage,
-      h("footer", { class: "st-foot" }, levelPicker(), h("span", { class: "small muted" }, "Hover or tap a node. Arrows show what unlocks what.")));
+      h("footer", { class: "st-foot" },
+        h("span", { class: "st-points" }, h("span", { class: "pt-sq big" }), " " + ptName + " Points spent: ", spentEl),
+        note,
+        h("span", { class: "st-actions" }, h("button", { type: "button", class: "st-btn", onclick: () => { learned.clear(); chosen.clear(); refresh(); hideTip(); } }, "Respec"), linkBtn)),
+      h("div", { class: "st-level" }, levelPicker()));
     setPage(T.name + " skill tree", h("p", { class: "crumbs" }, link("", "Codex"), " / ", link("skills", "Skill trees")), h("h1", null, "Skill trees"),
-      h("p", { class: "lede small" }, "The archetype, weapon and stamina trees as they are laid out in the game data: nodes, unlock order and point costs. Exact node positions live in the game interface, so the layout here follows the unlock chains."),
+      h("p", { class: "lede small" }, "Plan a build like in the game: click a node to learn it, Respec to start over, Confirm Choices to copy a link to your build. Node order and unlocks come from the game data; exact positions on screen do not, so the layout follows the unlock chains."),
       win);
+    refresh();
   }
 
   // ——— experience ———
@@ -533,6 +600,11 @@
     setPage("Experience", h("h1", null, "Experience"), h("nav", { class: "tabs", "aria-label": "Experience types" }, tabs.map(([id, n]) => h("a", { href: "#/xp/" + id, "aria-current": id === tab ? "page" : null }, n))), body);
   }
 
+  function pageSoon() {
+    setPage("Coming soon", h("p", { class: "crumbs" }, link("", "Codex")), h("h1", null, "Coming soon"),
+      h("p", { class: "lede small" }, "This part of the codex is still being checked against the game. It will open soon."),
+      h("p", null, "Open now: ", link("classes", "Classes"), ", ", link("skills", "Skill trees"), " and ", link("xp", "Experience"), "."));
+  }
   function pageMissing() { setPage("Not found", h("h1", null, "Page not found"), h("p", null, "Check the address or go back to the ", link("", "codex"), ".")); }
 
   async function route() {
@@ -543,7 +615,7 @@
     markNav(parts.join("/"));
     try {
       if (!parts.length) await pageHome();
-      else if (parts[0] === "search") await pageSearch(q);
+      else if (parts[0] === "search" || parts[0] === "db") pageSoon();
       else if (parts[0] === "xp") await pageXp(parts[1]);
       else if (parts[0] === "classes") await pageClasses(parts[1]);
       else if (parts[0] === "skills") await pageSkills(parts[1]);
