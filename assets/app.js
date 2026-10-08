@@ -461,7 +461,36 @@
     }), h("span", { class: "st-tab off", title: "Coming soon" }, "Skill Book"));
     const subs = group === "Stamina" ? null : h("div", { class: "st-sub" }, list.filter((t) => t.group === group).map((t) =>
       h("a", { href: "#/skills/" + t.id, class: "st-chip", "aria-current": t.id === id ? "page" : null }, icon(t.ic, "sm"), t.name)));
-    // geometry
+    // geometry: screenshot-led layouts for Cleric, Bard and Summoner.
+    // Other archetypes retain their source-data rows until their visual positions are verified.
+    const screenshotLayout = {
+      cleric: {
+        0:[226,86],1:[266,86],2:[306,86],4:[226,158],5:[266,158],7:[306,158],
+        9:[226,230],16:[266,230],17:[306,230],18:[346,230],31:[386,230],
+        21:[145,86],20:[145,158],22:[145,230],28:[145,302],
+        3:[226,302],8:[266,302],11:[306,302],12:[346,302],13:[386,302],14:[426,302],19:[466,302],
+        23:[226,374],30:[266,374],25:[306,374],26:[346,374],27:[386,374],
+        6:[266,446],10:[306,446],15:[346,446],29:[386,446],24:[426,446]
+      },
+      bard: {
+        0:[155,104],16:[196,104],23:[237,104],29:[278,104],31:[319,104],42:[360,104],43:[401,104],44:[442,104],
+        32:[155,160],36:[237,160],1:[278,160],2:[319,160],3:[360,160],4:[401,160],5:[442,160],
+        6:[155,232],7:[196,232],9:[237,232],11:[278,232],12:[319,232],13:[360,232],24:[401,232],
+        38:[196,284],41:[319,284],37:[360,284],
+        8:[155,356],10:[196,356],14:[237,356],15:[278,356],25:[319,356],26:[360,356],27:[401,356],35:[442,356],
+        17:[110,428],18:[151,428],19:[192,428],20:[233,428],21:[274,428],22:[315,428],28:[356,428],30:[397,428],33:[438,428],34:[479,428],39:[520,428],40:[561,428]
+      },
+      summoner: {
+        0:[195,34],1:[236,34],2:[277,34],3:[318,34],4:[359,34],5:[400,34],9:[441,34],17:[482,34],19:[523,34],
+        22:[154,92],23:[195,92],24:[236,92],25:[277,92],26:[318,92],27:[359,92],28:[400,92],29:[441,92],30:[482,92],
+        31:[154,150],32:[195,150],33:[236,150],34:[277,150],35:[318,150],36:[359,150],37:[400,150],38:[441,150],39:[482,150],
+        52:[523,150],40:[236,208],41:[318,208],43:[400,208],
+        10:[154,266],12:[195,266],13:[236,266],14:[277,266],15:[318,266],16:[359,266],20:[400,266],44:[441,266],45:[482,266],46:[523,266],
+        51:[236,324],53:[400,324],50:[154,324],49:[318,324],42:[482,324],
+        6:[154,382],7:[195,382],8:[236,382],11:[277,382],18:[318,382],21:[359,382],
+        48:[236,440],47:[400,440]
+      }
+    };
     let y = PADY, prevT = null, maxX = 0;
     const place = {}, tiers = [];
     T.rows.forEach((r) => {
@@ -469,7 +498,10 @@
       r.nodes.forEach(([k, x]) => { place[k] = [PADX + x * STEP, y]; maxX = Math.max(maxX, x); });
       y += ROWH; prevT = r.t;
     });
-    const W = PADX * 2 + maxX * STEP, H = y - ROWH + PADY + 10;
+    if (screenshotLayout[id]) Object.entries(screenshotLayout[id]).forEach(([k, xy]) => { if (N[+k]) place[+k] = xy; });
+    const coords = Object.values(place);
+    const W = Math.max(PADX * 2 + maxX * STEP, ...coords.map((p) => p[0] + 45));
+    const H = Math.max(y - ROWH + PADY + 10, ...coords.map((p) => p[1] + 45));
     const svg = s("svg", { class: "st-lines", width: W, height: H, viewBox: `0 0 ${W} ${H}`, "aria-hidden": "true" });
     const defs = s("defs"); const mk = s("marker", { id: "st-arrow", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 5, markerHeight: 5, orient: "auto-start-reverse" });
     mk.append(s("path", { d: "M0 0 L10 5 L0 10 z", class: "st-arrowhead" })); defs.append(mk); svg.append(defs);
@@ -570,7 +602,7 @@
         h("span", { class: "st-actions" }, h("button", { type: "button", class: "st-btn", onclick: () => { learned.clear(); chosen.clear(); refresh(); hideTip(); } }, "Respec"), linkBtn)),
       h("div", { class: "st-level" }, levelPicker()));
     setPage(T.name + " skill tree", h("p", { class: "crumbs" }, link("", "Codex"), " / ", link("skills", "Skill trees")), h("h1", null, "Skill trees"),
-      h("p", { class: "lede small" }, "Plan a build like in the game: click a node to learn it, Respec to start over, Confirm Choices to copy a link to your build. Node order and unlocks come from the game data; exact positions on screen do not, so the layout follows the unlock chains."),
+      h("p", { class: "lede small" }, "Plan a build like in the game: click a node to learn it, Respec to start over, Confirm Choices to copy a link to your build. Node order and unlocks come from game data. Cleric, Bard and Summoner use screenshot-guided layouts; other trees use a source-data-based arrangement pending visual verification."),
       win);
     refresh();
   }
