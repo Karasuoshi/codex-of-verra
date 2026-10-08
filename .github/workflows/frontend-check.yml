@@ -14,3 +14,7 @@ jobs:
           node-version: '22'
       - name: Check frontend and all skill trees
         run: node tools/check_frontend.mjs
+      - name: Install browser test runner
+        run: npm install --no-save playwright@1.58.2 && npx playwright install --with-deps chromium
+      - name: Browser smoke checks
+        run: node tools/check_browser.mjs
