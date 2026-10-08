@@ -500,8 +500,8 @@
     });
     if (screenshotLayout[id]) Object.entries(screenshotLayout[id]).forEach(([k, xy]) => { if (N[+k]) place[+k] = xy; });
     const coords = Object.values(place);
-    const W = Math.max(PADX * 2 + maxX * STEP, ...coords.map((p) => p[0] + 45));
-    const H = Math.max(y - ROWH + PADY + 10, ...coords.map((p) => p[1] + 45));
+    const W = screenshotLayout[id] ? Math.max(620, ...coords.map((p) => p[0] + 45)) : PADX * 2 + maxX * STEP;
+    const H = screenshotLayout[id] ? Math.max(505, ...coords.map((p) => p[1] + 45)) : y - ROWH + PADY + 10;
     const svg = s("svg", { class: "st-lines", width: W, height: H, viewBox: `0 0 ${W} ${H}`, "aria-hidden": "true" });
     const defs = s("defs"); const mk = s("marker", { id: "st-arrow", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 5, markerHeight: 5, orient: "auto-start-reverse" });
     mk.append(s("path", { d: "M0 0 L10 5 L0 10 z", class: "st-arrowhead" })); defs.append(mk); svg.append(defs);
@@ -513,7 +513,7 @@
       const ln = s("line", { x1: x1 + dx / len * r1, y1: y1 + dy / len * r1, x2: x2 - dx / len * r2, y2: y2 - dy / len * r2, class: "st-edge", "marker-end": "url(#st-arrow)" });
       edges.push([p, ln]); svg.append(ln);
     }));
-    const tierMarks = tiers.map((ty) => h("div", { class: "st-tier", style: `top:${ty}px` }));
+    const tierMarks = screenshotLayout[id] ? [] : tiers.map((ty) => h("div", { class: "st-tier", style: `top:${ty}px` }));
     // tooltip
     let pinned = null;
     const tipHost = h("div", { class: "st-tiphost" });
