@@ -65,8 +65,8 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
-| 2026-10-08 | Skill trees in the in-game panel style: archetype, weapon and stamina trees with the game's own backgrounds and node frames, unlock arrows, point costs and tooltips. | not published |
-| 2026-10-08 | Ability numbers: mana by character level, cooldown, charges, range and damage or healing percentages on class pages and ability records. | not published |
+| 2026-10-08 | Skill trees in the in-game panel style: archetype, weapon and stamina trees with the game's own backgrounds and node frames, unlock arrows, point costs and tooltips. | published |
+| 2026-10-08 | Ability numbers: mana by character level, cooldown, charges, range and damage or healing percentages on class pages and ability records. | published |
 | 2026-10-08 | Icons for items, recipes, abilities, status effects and class pages. | published |
 | 2026-10-08 | Classes: abilities grouped by archetype and kind; status effects in ability texts link to their pages; undecoded numbers shown as labels. | published |
 | 2026-10-07 | First build: 10 sections, record data split into shards for upload through the GitHub web page, link preview image. | published |
