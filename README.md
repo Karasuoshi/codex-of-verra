@@ -70,7 +70,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
-| 2026-10-08 | Contributor guide (`AGENTS.md`) for people and AI assistants; all extractors in `tools/` with a one-command rebuild (`build_all.sh`) and a check against in-game tooltips. Loot data now shows names of curves and items in place of raw ids (loot section is still locked). | draft |
+| 2026-10-08 | Contributor guide (`AGENTS.md`) for people and AI assistants; all extractors in `tools/` with a one-command rebuild (`build_all.sh`) and a check against in-game tooltips. Loot data now shows names of curves and items in place of raw ids (loot section is still locked). | published |
 | 2026-10-08 | Skill tree planner in the game's look (learn, Respec, shareable build link). Only Classes, Skill trees and Experience are open; other sections show as coming soon. Work-in-progress note on the home page. | published |
 | 2026-10-08 | Skill trees in the in-game panel style: archetype, weapon and stamina trees with the game's own backgrounds and node frames, unlock arrows, point costs and tooltips. | published |
 | 2026-10-08 | Ability numbers: mana by character level, cooldown, charges, range and damage or healing percentages on class pages and ability records. | published |
