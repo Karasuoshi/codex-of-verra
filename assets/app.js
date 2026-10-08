@@ -40,7 +40,7 @@
     return cache.get(path);
   }
   // Only these parts of the codex are open for now; everything else is shown but not clickable.
-  const OPEN = /^(|classes(\/.*)?|skills(\/.*)?|xp(\/.*)?)$/;
+  const OPEN = /^(|classes(\/.*)?|skills(\/.*)?|xp(\/.*)?|improvements(\/.*)?)$/;
   const isOpen = (to) => OPEN.test(String(to).split("?")[0]);
   const link = (to, text, cls) => isOpen(to) ? h("a", { href: "#/" + to, class: cls }, text)
     : h("span", { class: "locked" + (cls ? " " + cls : ""), title: "Coming soon" }, text);
@@ -128,7 +128,7 @@
 
   // ——— shell ———
   function buildNav() {
-    const groups = [["Classes & skills", [["classes", "Classes"], ["skills", "Skill trees"], ["xp", "Experience"]]],
+    const groups = [["Classes & skills", [["classes", "Classes"], ["skills", "Skill trees"], ["xp", "Experience"], ["improvements", "Possible Improvements"]]],
       ["Coming soon", ["items", "creatures", "recipes", "loot", "quests", "places", "abilities", "effects", "lore", "formulas"]]];
     const has = (id) => Array.isArray(id) || INDEX.sections.some((x) => x.id === id);
     nav.replaceChildren(
@@ -161,6 +161,7 @@
           h("span", { class: "card-title" }, "Classes"), h("span", { class: "card-count" }, "8"), h("span", { class: "card-blurb" }, "Tank, Fighter, Rogue, Ranger, Mage, Cleric, Summoner and Bard with their abilities."))),
         h("li", null, h("a", { href: "#/skills", class: "card" },
           h("span", { class: "card-title" }, "Skill trees"), h("span", { class: "card-count" }, "23"), h("span", { class: "card-blurb" }, "Archetype, weapon and stamina trees in the in-game style. Plan a build and share it."))),
+        h("li", null, h("a", { href: "#/improvements", class: "card" }, h("span", { class: "card-title" }, "Possible Improvements"), h("span", { class: "card-blurb" }, "Independent community proposals for expanding Verra. Explore Guild Championships."))),
         INDEX.xp ? h("li", null, h("a", { href: "#/xp", class: "card" },
           h("span", { class: "card-title" }, "Experience"), h("span", { class: "card-count" }, "XP"), h("span", { class: "card-blurb" }, "Experience curves for character, artisan skills, weapons and guilds."))) : null,
         INDEX.sections.map((x) => h("li", null, h("div", { class: "card soon", "aria-disabled": "true" },
@@ -574,6 +575,60 @@
     refresh();
   }
 
+
+  // ——— community proposals (not extracted or confirmed game features) ———
+  function pageImprovements(slug) {
+    if (!slug) {
+      setPage("Possible Improvements",
+        h("h1", null, "Possible Improvements"),
+        h("p", { class: "lede small" }, "Independent proposals for expanding the world of Verra. These are design concepts, not features confirmed in the game client."),
+        h("article", { class: "idea-card" },
+          h("h2", null, "Guild Championships"),
+          h("p", null, "What if Node mayors could organize regional guild tournaments? Eight-player guild teams compete in structured PvP events, funded by city treasuries and entrance fees. Victories bring valuable resources, temporary champion mounts and lasting recognition for the host city."),
+          h("a", { class: "idea-more", href: "#/improvements/guild-championships" }, "SHOW MORE →")));
+      return;
+    }
+    if (slug !== "guild-championships") { pageMissing(); return; }
+    const pages = {
+      overview: [["The concept", "A developed Node's mayor can host a regional championship. Eligible guilds register one team of eight players. Events are intentionally rare, with a proposed cadence of one or two championships per month."],
+        ["Participation", "Registration closes before the tournament. Rosters lock at the start. Regional eligibility, minimum guild age and independent participation requirements discourage shell guilds and staged results."],
+        ["Implementation path", "Start with a single 8v8 bracket, registration, escrow and validated payouts. Expand to other modes and champion mounts after the basic event works reliably."]],
+      economy: [["Funding", "The host Node contributes from its treasury and guilds pay entrance fees. Both sources are committed to escrow before registration closes."],
+        ["Example fee allocation", "Illustrative only: eight guilds each pay 200 gold (1,600 gold total). Allocate 75% to prizes, 15% to the host treasury and 10% to a currency sink. The city's separate treasury contribution is additional and must be balanced independently."],
+        ["Resource integrity", "Rare material rewards should come from pre-funded existing inventories, rather than unlimited newly generated resources. Define material types, grades, amounts and refund rules before implementation."]],
+      formats: [["Guild Clash", "Eight versus eight. A best-of-three elimination bracket is the recommended first playable format."],
+        ["King of the Hill", "Teams fight over rotating control points, with scoring based on uncontested occupation."],
+        ["Capture the Banner", "Steal and deliver the opposing banner while defending your own."],
+        ["Relic Run", "Recover a contested relic and deliver it to an extraction point that changes between rounds."],
+        ["Caravan Breaker", "One team escorts a tournament caravan while the other intercepts it; sides swap between rounds."]],
+      rewards: [["Guild rewards", "Winning guilds earn a portion of the committed resources, public recognition and temporary champion ground mounts for the winning roster. The suggested +5% mount-speed advantage remains a balance question, not a fixed rule."],
+        ["City Legacy — Champion's Endurance", "After a series of successfully hosted championships, the city earns a temporary blessing: +5% Stamina Regeneration for all residents of the host Node. A working milestone is five completed championships, held approximately one or two times per month. The milestone, buff duration and reset rules remain open for balancing."],
+        ["Anti-exploit requirements", "Only legitimate completed tournaments with enough independent participating guilds count toward City Legacy. Cancelled, abandoned or collusive events must not advance the milestone."]],
+      technical: [["Mayor permissions and scheduling", "Which Node stages can host? Who can spend treasury funds? How do cooldowns interact with sieges and other Node events?"],
+        ["Eligibility and integrity", "How are regional membership, guild age, one-team-per-guild limits, locked rosters and shell guilds validated?"],
+        ["Match rules", "Are matches isolated? Which PvP flagging, corruption, death penalties, party restrictions and disconnect rules apply?"],
+        ["Treasury and escrow", "When are city contributions, guild fees and materials reserved? How are cancellations, refunds and failed matches handled?"],
+        ["Rewards and entitlements", "How does the server verify winners, distribute material prizes and grant, expire or revoke non-tradable champion mounts?"],
+        ["City Legacy", "How is a completed legitimate championship counted? Who qualifies as a resident? Does the stamina regeneration bonus apply in PvP? How long does it last, and can it stack?"],
+        ["Operations", "What are the server-performance limits, administrative recovery procedures and audit requirements?"]]
+    };
+    const labels = [["overview", "Overview"], ["economy", "Economy"], ["formats", "PvP Formats"], ["rewards", "Rewards"], ["technical", "Technical Considerations"]];
+    const tabs = h("nav", { class: "idea-tabs", "aria-label": "Guild Championships topics" });
+    const body = h("div", { class: "idea-body" });
+    const choose = (key) => {
+      tabs.querySelectorAll("button").forEach((b) => { b.setAttribute("aria-selected", b.dataset.tab === key ? "true" : "false"); });
+      body.replaceChildren(...pages[key].map(([title, copy]) => h("section", { class: "idea-panel" }, h("h2", null, title), h("p", null, copy))));
+    };
+    labels.forEach(([key, label]) => { const b = h("button", { type: "button", "data-tab": key, "aria-selected": "false", onclick: () => choose(key) }, label); tabs.append(b); });
+    setPage("Guild Championships",
+      h("p", { class: "crumbs" }, link("", "Codex"), " / ", link("improvements", "Possible Improvements")),
+      h("h1", null, "Guild Championships"),
+      h("p", { class: "lede small" }, "A proposal for city-sponsored regional guild tournaments: meaningful PvP, Node economics, and long-term civic rewards."),
+      h("p", { class: "meta" }, "Community design proposal · Not an existing confirmed game mechanic"),
+      tabs, body);
+    choose("overview");
+  }
+
   // ——— experience ———
   async function pageXp(tab) {
     const xp = await load("xp.json");
@@ -616,6 +671,7 @@
     try {
       if (!parts.length) await pageHome();
       else if (parts[0] === "search" || parts[0] === "db") pageSoon();
+      else if (parts[0] === "improvements") pageImprovements(parts[1]);
       else if (parts[0] === "xp") await pageXp(parts[1]);
       else if (parts[0] === "classes") await pageClasses(parts[1]);
       else if (parts[0] === "skills") await pageSkills(parts[1]);
