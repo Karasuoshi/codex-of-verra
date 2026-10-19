@@ -51,7 +51,7 @@
       "list": [
         "Сервер не копия Early Access. Evolve меняет баланс, добавляет квесты, торговцев и системы. Гайды из прошлого могут местами не совпадать.",
         "Когда тесты станут стабильными, обещают постоянный сервер с нуля и бэкапами.",
-        "Баги и новости — в [Discord Evolve](https://discord.gg/bkVYBbe2sP). Обещают также Linux и macOS, современный клиент и рендер."
+        "Баги и новости — в [Discord Evolve](https://discord.gg/bkVYBbe2sP). В планах проекта — современный клиент и рендер, поддержка Linux и macOS."
       ]
     },
     {
@@ -60,20 +60,50 @@
         "Мы проверяли Companion 7 октября 2026 (версия 2.0.0): 0 срабатываний из 71 на VirusTotal, подпись действительна, © Spectre Games LLC. Новая версия будет с другим хэшем — тогда смотри на подпись."
       ],
       "table": {
-        "head": ["Файл", "SHA-256 (версия 2.0.0)"],
+        "head": [
+          "Файл",
+          "SHA-256 (версия 2.0.0)"
+        ],
         "rows": [
-          ["`EvolveCompanionSetup.exe`", "`0976b235cfd46becda7719724bc54f8aa1f787babc1ac32b39a89f9f73412b6e`"],
-          ["`EvolveCompanion.exe`", "`c99a366d0122f950bda4be0be382dbe037d2df366a5fec04dc61df07740396f7`"]
+          [
+            "`EvolveCompanionSetup.exe`",
+            "`0976b235cfd46becda7719724bc54f8aa1f787babc1ac32b39a89f9f73412b6e`"
+          ],
+          [
+            "`EvolveCompanion.exe`",
+            "`c99a366d0122f950bda4be0be382dbe037d2df366a5fec04dc61df07740396f7`"
+          ]
         ]
       },
-      "after": ["Проверить свой файл: в PowerShell `Get-FileHash .\\EvolveCompanionSetup.exe`."]
+      "after": [
+        "Проверить свой файл: в PowerShell `Get-FileHash .\\EvolveCompanionSetup.exe`."
+      ]
     }
   ],
   "sources": [
-    ["Evolve: FAQ", "https://aocevolve.com/faq/"],
-    ["Evolve: Download", "https://aocevolve.com/download/"],
-    ["Evolve: Roadmap", "https://aocevolve.com/roadmap/"],
-    ["Evolve: The project", "https://aocevolve.com/project/"],
-    ["GameFragger, 17.10.2026: Ashes of Creation снова играбельна", "https://gamefragger.com/multiplatform/massively-multiplayer/ashes-of-creation-is-playable-again-months-after-intrepid-studios-shut-down-thanks-to-a-fan-server-a29891"]
+    [
+      "Evolve: FAQ",
+      "https://aocevolve.com/faq/"
+    ],
+    [
+      "Evolve: Download",
+      "https://aocevolve.com/download/"
+    ],
+    [
+      "Evolve: Roadmap",
+      "https://aocevolve.com/roadmap/"
+    ],
+    [
+      "Evolve: The project",
+      "https://aocevolve.com/project/"
+    ],
+    [
+      "GameFragger, 17.10.2026: Ashes of Creation снова играбельна",
+      "https://gamefragger.com/multiplatform/massively-multiplayer/ashes-of-creation-is-playable-again-months-after-intrepid-studios-shut-down-thanks-to-a-fan-server-a29891"
+    ],
+    [
+      "Wikipedia: Ashes of Creation (снята с продажи в Steam 02.02.2026)",
+      "https://en.wikipedia.org/wiki/Ashes_of_Creation"
+    ]
   ]
 }

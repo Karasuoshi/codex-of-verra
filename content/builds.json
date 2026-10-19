@@ -4,25 +4,119 @@
   "updated": "2026-10-19",
   "note": "Evolve меняет баланс, так что это отправная точка, а не истина. Нашли, что работает лучше, — поправим здесь.",
   "stamina_presets": {
-    "ranged": { "name": "Дальний бой и хилы", "skills": ["Escape Velocity", "Recuperation", "Evasive Maneuver", "Guard Training I", "Mental Fortification"], "text": "Escape Velocity (скорость спринта в бою) → Recuperation и Evasive Maneuver (уклонение, открывает Springstep) → Guard Training остатком → Mental Fortification по желанию. Блок на старте не качать: живём уклонениями и спринтом." },
-    "melee": { "name": "Ближний бой", "skills": ["Focused Sprint", "Escape Velocity", "Second Wind"], "text": "Focused Sprint (сначала, без него не открыть остальное) → Escape Velocity → Second Wind последним. Graceful Reflexes — если нужно выходить из контроля уклонением." },
-    "tank": { "name": "Танк", "skills": ["Mental Fortification", "Empowered Guard", "Escape Velocity", "Evasive Maneuver"], "text": "Ставка на блок: Mental Fortification и Empowered Guard в приоритете. Потом Escape Velocity и Evasive Maneuver для перемещения." }
+    "ranged": {
+      "name": "Дальний бой и хилы",
+      "skills": [
+        "Escape Velocity",
+        "Recuperation",
+        "Evasive Maneuver",
+        "Guard Training I",
+        "Mental Fortification"
+      ],
+      "text": "Escape Velocity (скорость спринта в бою) → Recuperation и Evasive Maneuver (уклонение, открывает Springstep) → Guard Training остатком → Mental Fortification по желанию. Блок на старте не качать: живём уклонениями и спринтом."
+    },
+    "melee": {
+      "name": "Ближний бой",
+      "skills": [
+        "Focused Sprint",
+        "Escape Velocity",
+        "Second Wind"
+      ],
+      "text": "Focused Sprint (сначала, без него не открыть остальное) → Escape Velocity → Second Wind последним. Graceful Reflexes — если нужно выходить из контроля уклонением."
+    },
+    "tank": {
+      "name": "Танк",
+      "skills": [
+        "Mental Fortification",
+        "Empowered Guard",
+        "Escape Velocity",
+        "Evasive Maneuver"
+      ],
+      "text": "Ставка на блок: Mental Fortification и Empowered Guard в приоритете. Потом Escape Velocity и Evasive Maneuver для перемещения."
+    }
   },
   "classes": [
     {
-      "id": "bard", "name": "Bard", "role": "Поддержка, хил и мана для группы", "difficulty": "Лёгкий",
-      "weapons": "Longbow. На 1–10 можно Book: AoE по пачке.",
+      "id": "bard",
+      "name": "Bard",
+      "role": "Поддержка, хил и мана для группы",
+      "difficulty": "Лёгкий",
+      "weapons": "Greatsword и Longbow. На 1–10 вместо Longbow можно Book: AoE по пачке.",
       "builds": [
-        { "name": "Соло-прокачка", "skills": ["Instrument Flute", "Cathartic Melody", "Maddening Dance", "Get Off The Stage", "Fierce Wit", "Quick Wit", "Discordance", "Dark Lullaby", "Epic Melody", "Flourish", "Dance Mastery: Power", "Pensive Melody", "Fortissimo", "Conflict", "Chaos", "Saga", "Gambit", "Marionette"] },
-        { "name": "Группа (PvE)", "skills": ["Instrument Flute", "Anthem of Alacrity (AOE)", "Flourish", "Dance Mastery: Power", "Chilling Lament (AOE)", "Lovely Serenade (AOE)", "Hymn of the Mind (AOE)", "Pensive Melody", "Fortissimo", "Shielding Dance", "Nimble Dance", "Epic Melody", "Triumph", "Joy", "Wonder", "Saga", "Gambit", "Marionette", "Quick Wit", "Discordance"] }
+        {
+          "name": "Соло-прокачка",
+          "skills": [
+            "Instrument Flute",
+            "Cathartic Melody",
+            "Maddening Dance",
+            "Get Off The Stage",
+            "Fierce Wit",
+            "Quick Wit",
+            "Discordance",
+            "Dark Lullaby",
+            "Epic Melody",
+            "Flourish",
+            "Dance Mastery: Power",
+            "Pensive Melody",
+            "Fortissimo",
+            "Conflict",
+            "Chaos",
+            "Saga",
+            "Gambit",
+            "Marionette"
+          ]
+        },
+        {
+          "name": "Группа (PvE)",
+          "skills": [
+            "Instrument Flute",
+            "Anthem of Alacrity (AOE)",
+            "Flourish",
+            "Dance Mastery: Power",
+            "Chilling Lament (AOE)",
+            "Lovely Serenade (AOE)",
+            "Hymn of the Mind (AOE)",
+            "Pensive Melody",
+            "Fortissimo",
+            "Shielding Dance",
+            "Nimble Dance",
+            "Epic Melody",
+            "Triumph",
+            "Joy",
+            "Wonder",
+            "Saga",
+            "Gambit",
+            "Marionette",
+            "Quick Wit",
+            "Discordance"
+          ]
+        }
       ],
       "rotations": [
-        ["Соло AoE", "Собрать мобов автоатаками → Cathartic Melody → Maddening Dance → Get Off The Stage → Fierce Wit → Quick Wit → Discordance"],
-        ["Соло одна цель", "Discordance → Get Off The Stage → Fierce Wit → Maddening Dance → Quick Wit ×2 → Dark Lullaby"],
-        ["Группа: хил и баффы", "Anthem of Alacrity (AOE) → Flourish → Chilling Lament (AOE) → Lovely Serenade (AOE) → Hymn of the Mind (AOE) + Pensive Melody → Fortissimo"],
-        ["Saga на урон", "Conflict → Chaos → Conflict → Saga"],
-        ["Saga на поддержку", "Triumph → Joy → Triumph → Flourish → Saga"],
-        ["Saga на ману", "Wonder ×3 → Saga в конце пула, предупреди пати"]
+        [
+          "Соло AoE",
+          "Собрать мобов автоатаками → Cathartic Melody → Maddening Dance → Get Off The Stage → Fierce Wit → Quick Wit → Discordance"
+        ],
+        [
+          "Соло одна цель",
+          "Discordance → Get Off The Stage → Fierce Wit → Maddening Dance → Quick Wit ×2 → Dark Lullaby"
+        ],
+        [
+          "Группа: хил и баффы",
+          "Anthem of Alacrity (AOE) → Flourish → Chilling Lament (AOE) → Lovely Serenade (AOE) → Hymn of the Mind (AOE) + Pensive Melody → Fortissimo"
+        ],
+        [
+          "Saga на урон",
+          "Conflict → Chaos → Conflict → Saga"
+        ],
+        [
+          "Saga на поддержку",
+          "Triumph → Joy → Triumph → Flourish → Saga"
+        ],
+        [
+          "Saga на ману",
+          "Wonder ×3 → Saga в конце пула, предупреди пати"
+        ]
       ],
       "stamina": "ranged",
       "tips": [
@@ -32,18 +126,57 @@
         "Marionette надолго станит моба — удобно держать дальника.",
         "Инструмент (Flute, Fiddle, Drum) меняет только звук."
       ],
-      "source": "https://metabattle.com/aoc/Bard_-_Leveling_Build"
+      "source": [
+        "https://metabattle.com/aoc/Bard_-_Leveling_Build",
+        "https://metabattle.com/aoc/Bard_-_PvE_Build"
+      ]
     },
     {
-      "id": "cleric", "name": "Cleric", "role": "Хил", "difficulty": "Лёгкий",
+      "id": "cleric",
+      "name": "Cleric",
+      "role": "Хил",
+      "difficulty": "Лёгкий",
       "weapons": "Greatsword в ближнем бою, Book — собирать мобов автоатаками.",
       "builds": [
-        { "name": "Прокачка и группа", "skills": ["Bless Weapon", "Soothing Glow", "Chains of Restraint", "Consecrating Wave", "Judgment", "Divine Flare", "Smite", "Wings of Salvation", "Defiant Light", "Communal Restoration", "Resplendent Beam", "Condemn", "Purify", "Barrier", "Divine Infusion", "Flash Cure", "Mend", "Healing Touch", "Deliverance", "Resurrect"] }
+        {
+          "name": "Прокачка и группа",
+          "skills": [
+            "Bless Weapon",
+            "Soothing Glow",
+            "Chains of Restraint",
+            "Consecrating Wave",
+            "Judgment",
+            "Divine Flare",
+            "Smite",
+            "Wings of Salvation",
+            "Defiant Light",
+            "Communal Restoration",
+            "Resplendent Beam",
+            "Condemn",
+            "Purify",
+            "Barrier",
+            "Divine Infusion",
+            "Flash Cure",
+            "Mend",
+            "Healing Touch",
+            "Deliverance",
+            "Resurrect"
+          ]
+        }
       ],
       "rotations": [
-        ["AoE прокачка", "Bless Weapon → Soothing Glow → Chains of Restraint → Consecrating Wave → Judgment → Soothing Glow → Divine Flare"],
-        ["Одна цель", "Bless Weapon → Soothing Glow → Smite → Judgment → Consecrating Wave"],
-        ["Спасти союзника", "Wings of Salvation на умирающего → Defiant Light"]
+        [
+          "AoE прокачка",
+          "Bless Weapon → Soothing Glow → Chains of Restraint → Consecrating Wave → Judgment → Soothing Glow → Divine Flare"
+        ],
+        [
+          "Одна цель",
+          "Bless Weapon → Soothing Glow → Smite → Judgment → Consecrating Wave"
+        ],
+        [
+          "Спасти союзника",
+          "Wings of Salvation на умирающего → Defiant Light"
+        ]
       ],
       "stamina": "ranged",
       "tips": [
@@ -54,16 +187,49 @@
         "Divine Flare по союзникам лечит их и бьёт мобов вокруг.",
         "Condemn держит одного моба, пока группа разбирается с остальными."
       ],
-      "source": "https://metabattle.com/aoc/Cleric_-_Leveling_Build"
+      "source": [
+        "https://metabattle.com/aoc/Cleric_-_Leveling_Build",
+        "https://metabattle.com/aoc/Cleric_-_PvE_Build"
+      ]
     },
     {
-      "id": "tank", "name": "Tank", "role": "Танк", "difficulty": "Сложный",
+      "id": "tank",
+      "name": "Tank",
+      "role": "Танк",
+      "difficulty": "Сложный",
       "weapons": "Sword + Shield, запасной — Longbow.",
       "builds": [
-        { "name": "Прокачка и группа", "skills": ["Shield Slam", "Vengeance", "Inciting Stikes", "Desolate", "Tomahawk", "Slam", "Reflect", "Refreshing Reflect", "Aegis", "Fortify", "Wall", "Charge", "Taunt", "Grit", "Intercept", "Protect", "Shake It Off", "Intimidating Aura", "Absorption Field", "Iron Aura"] }
+        {
+          "name": "Прокачка и группа",
+          "skills": [
+            "Shield Slam",
+            "Vengeance",
+            "Inciting Stikes",
+            "Desolate",
+            "Tomahawk",
+            "Slam",
+            "Reflect",
+            "Refreshing Reflect",
+            "Aegis",
+            "Fortify",
+            "Wall",
+            "Charge",
+            "Taunt",
+            "Grit",
+            "Intercept",
+            "Protect",
+            "Shake It Off",
+            "Intimidating Aura",
+            "Absorption Field",
+            "Iron Aura"
+          ]
+        }
       ],
       "rotations": [
-        ["AoE прокачка", "Пул автоатаками, мобы перед собой → Shield Assault (даёт Courage) → Vengeance → Inciting Strikes → Desolate → Tomahawk → Slam при необходимости"]
+        [
+          "AoE прокачка",
+          "Пул автоатаками, мобы перед собой → Shield Assault (даёт Courage) → Vengeance → Inciting Strikes → Desolate → Tomahawk → Slam при необходимости"
+        ]
       ],
       "stamina": "tank",
       "tips": [
@@ -77,15 +243,48 @@
       "source": "https://metabattle.com/aoc/Tank_-_Leveling_Build"
     },
     {
-      "id": "fighter", "name": "Fighter", "role": "Урон в ближнем бою", "difficulty": "Лёгкий",
+      "id": "fighter",
+      "name": "Fighter",
+      "role": "Урон в ближнем бою",
+      "difficulty": "Лёгкий",
       "weapons": "Greatsword, запасной — Longbow для пула.",
       "builds": [
-        { "name": "Прокачка и группа", "skills": ["Blitz", "Rupture", "Lunging Assault", "Overpower", "Wallop", "Lethal Blow", "Reinvigorating Lethal Blow", "Consuming Lethal Blow", "Whirlwind", "Climactic Whirlwind", "Brutal Cleave", "Cataclysm", "Maim", "Leap Strike", "Battle Cry", "Form Of Celerity", "Art of War"] }
+        {
+          "name": "Прокачка и группа",
+          "skills": [
+            "Blitz",
+            "Rupture",
+            "Lunging Assault",
+            "Overpower",
+            "Wallop",
+            "Lethal Blow",
+            "Reinvigorating Lethal Blow",
+            "Consuming Lethal Blow",
+            "Whirlwind",
+            "Climactic Whirlwind",
+            "Brutal Cleave",
+            "Cataclysm",
+            "Maim",
+            "Leap Strike",
+            "Battle Cry",
+            "Form Of Celerity",
+            "Art of War"
+          ]
+        }
       ],
       "rotations": [
-        ["AoE на низких уровнях", "Пул луком → Brutal Cleave → Whirlwind"],
-        ["Одна цель", "Blitz → Rupture → Lunging Assault → Overpower → Wallop → Lethal Blow"],
-        ["AoE в группе", "Form Of Celerity → Battle Cry → Brutal Cleave → Cataclysm → Maim → Lunging Assault ×2 → Leap Strike"]
+        [
+          "AoE на низких уровнях",
+          "Пул луком → Brutal Cleave → Whirlwind"
+        ],
+        [
+          "Одна цель",
+          "Blitz → Rupture → Lunging Assault → Overpower → Wallop → Lethal Blow"
+        ],
+        [
+          "AoE в группе",
+          "Form Of Celerity → Battle Cry → Brutal Cleave → Cataclysm → Maim → Lunging Assault ×2 → Leap Strike"
+        ]
       ],
       "stamina": "melee",
       "tips": [
@@ -97,15 +296,47 @@
       "source": "https://metabattle.com/aoc/Fighter_-_Leveling_Build"
     },
     {
-      "id": "mage", "name": "Mage", "role": "Урон магией", "difficulty": "Лёгкий",
+      "id": "mage",
+      "name": "Mage",
+      "role": "Урон магией",
+      "difficulty": "Лёгкий",
       "weapons": "Book или Wand (автоатаки жезлом в ротации Frost).",
       "builds": [
-        { "name": "Прокачка и группа", "skills": ["Firebolt", "Combust", "Blink", "Lightning Strike", "Fuse", "Frostbolt", "Shatter", "Shattering Shards", "Chain Lightning", "Hoarfrost", "Cone of Cold", "Magma Field", "Ball Lightning", "Prismatic Beam", "Shell", "Enchant Weapon"] }
+        {
+          "name": "Прокачка и группа",
+          "skills": [
+            "Firebolt",
+            "Combust",
+            "Blink",
+            "Lightning Strike",
+            "Fuse",
+            "Frostbolt",
+            "Shatter",
+            "Shattering Shards",
+            "Chain Lightning",
+            "Hoarfrost",
+            "Cone of Cold",
+            "Magma Field",
+            "Ball Lightning",
+            "Prismatic Beam",
+            "Shell",
+            "Enchant Weapon"
+          ]
+        }
       ],
       "rotations": [
-        ["Одна цель, огонь", "Firebolt ×3 → Combust → Blink → Lightning Strike. С Fuse начинай с Lightning Strike."],
-        ["Одна цель, лёд и молния", "Frostbolt → автоатаки, пока цель не замёрзнет → Lightning Strike (не до конца, только Shatter) → Frostbolt (Shattering Shards) → Chain Lightning"],
-        ["AoE в группе (танк держит)", "Arcane Circle → Hoarfrost → Cone of Cold → Magma Field → Ball Lightning → Chain Lightning → Prismatic Beam"]
+        [
+          "Одна цель, огонь",
+          "Firebolt ×3 → Combust → Blink → Lightning Strike. С Fuse начинай с Lightning Strike."
+        ],
+        [
+          "Одна цель, лёд и молния",
+          "Frostbolt → автоатаки, пока цель не замёрзнет → Lightning Strike (не до конца, только Shatter) → Frostbolt (Shattering Shards) → Chain Lightning"
+        ],
+        [
+          "AoE в группе (танк держит)",
+          "Arcane Circle → Hoarfrost → Cone of Cold → Magma Field → Ball Lightning → Chain Lightning → Prismatic Beam"
+        ]
       ],
       "stamina": "ranged",
       "tips": [
@@ -117,15 +348,46 @@
       "source": "https://metabattle.com/aoc/Mage_-_Leveling_Build"
     },
     {
-      "id": "ranger", "name": "Ranger", "role": "Урон с дистанции", "difficulty": "Средний",
+      "id": "ranger",
+      "name": "Ranger",
+      "role": "Урон с дистанции",
+      "difficulty": "Средний",
       "weapons": "Longbow, ближнее — Greatsword. На Radiant: Hawk Bow, потом Nightreaver или Pyrebrand.",
       "builds": [
-        { "name": "Прокачка и группа", "skills": ["Scatter Shot", "Concentrated Scatter Shot", "Disengage", "Enhance Armament: Weight", "Enhance Armament: Barbs", "Hunt of the Tiger", "Bear Trap", "Power Shot", "Barrage", "Snipe", "Lightning Reload", "Thundering Shot", "Headshot", "Air Strike", "Raining Death"] }
+        {
+          "name": "Прокачка и группа",
+          "skills": [
+            "Scatter Shot",
+            "Concentrated Scatter Shot",
+            "Disengage",
+            "Enhance Armament: Weight",
+            "Enhance Armament: Barbs",
+            "Hunt of the Tiger",
+            "Bear Trap",
+            "Power Shot",
+            "Barrage",
+            "Snipe",
+            "Lightning Reload",
+            "Thundering Shot",
+            "Headshot",
+            "Air Strike",
+            "Raining Death"
+          ]
+        }
       ],
       "rotations": [
-        ["AoE на низких уровнях", "Enhance Armament: Weight и Hunt of the Tiger включены → пул, выстроить мобов в линию → Scatter Shot ×2 → Disengage"],
-        ["Одна цель", "Enhance Armament: Barbs, Bear Trap между собой и целью → Barrage → Power Shot → Barrage → Snipe → Lightning Reload → Snipe → Thundering Shot → Headshot ниже 50% HP"],
-        ["AoE на высоких уровнях", "Weight и Hunt of the Tiger → Scatter Shot ×2 → Air Strike → Thundering Shot → Raining Death → Lightning Reload → Raining Death"]
+        [
+          "AoE на низких уровнях",
+          "Enhance Armament: Weight и Hunt of the Tiger включены → пул, выстроить мобов в линию → Scatter Shot ×2 → Disengage"
+        ],
+        [
+          "Одна цель",
+          "Enhance Armament: Barbs, Bear Trap между собой и целью → Barrage → Power Shot → Barrage → Snipe → Lightning Reload → Snipe → Thundering Shot → Headshot ниже 50% HP"
+        ],
+        [
+          "AoE на высоких уровнях",
+          "Weight и Hunt of the Tiger → Scatter Shot ×2 → Air Strike → Thundering Shot → Raining Death → Lightning Reload → Raining Death"
+        ]
       ],
       "stamina": "ranged",
       "tips": [
@@ -136,14 +398,42 @@
       "source": "https://metabattle.com/aoc/Ranger_-_Leveling_Build"
     },
     {
-      "id": "rogue", "name": "Rogue", "role": "Урон в ближнем бою", "difficulty": "Средний",
+      "id": "rogue",
+      "name": "Rogue",
+      "role": "Урон в ближнем бою",
+      "difficulty": "Средний",
       "weapons": "Greatsword, запасной — Shortbow для пула.",
       "builds": [
-        { "name": "Прокачка и группа", "skills": ["Ambusher", "Stealth", "Stab", "Thrash", "Acrobatic Strike", "Doublestrike", "Feint", "Throw", "Draining Poison", "Lacerate", "Kick", "Flurry", "Sap", "Soothing Shadows", "Trounce"] }
+        {
+          "name": "Прокачка и группа",
+          "skills": [
+            "Ambusher",
+            "Stealth",
+            "Stab",
+            "Thrash",
+            "Acrobatic Strike",
+            "Doublestrike",
+            "Feint",
+            "Throw",
+            "Draining Poison",
+            "Lacerate",
+            "Kick",
+            "Flurry",
+            "Sap",
+            "Soothing Shadows",
+            "Trounce"
+          ]
+        }
       ],
       "rotations": [
-        ["Одна цель", "Stealth со спины → Stab → Thrash → Acrobatic Strike (когда моб повернулся) → Doublestrike → Thrash → Feint → Thrash → Throw"],
-        ["AoE", "Stealth → собрать мобов луком → Draining Poison → Thrash → Throw → Thrash → Lacerate → Thrash → Kick → Flurry → Feint → Doublestrike"]
+        [
+          "Одна цель",
+          "Stealth со спины → Stab → Thrash → Acrobatic Strike (когда моб повернулся) → Doublestrike → Thrash → Feint → Thrash → Throw"
+        ],
+        [
+          "AoE",
+          "Stealth → собрать мобов луком → Draining Poison → Thrash → Throw → Thrash → Lacerate → Thrash → Kick → Flurry → Feint → Doublestrike"
+        ]
       ],
       "stamina": "melee",
       "tips": [
@@ -154,14 +444,37 @@
       "source": "https://metabattle.com/aoc/Rogue_-_Leveling_Build"
     },
     {
-      "id": "summoner", "name": "Summoner", "role": "Урон, доты и питомцы", "difficulty": "Лёгкий",
+      "id": "summoner",
+      "name": "Summoner",
+      "role": "Урон, доты и питомцы",
+      "difficulty": "Лёгкий",
       "weapons": "Greatsword или Great Mace, запасной — Longbow.",
       "builds": [
-        { "name": "PvE", "skills": ["Summon Spirit Hunter", "Dimensional Bolt", "Hex", "Spirit Shred", "Disintegrate", "Soul Flare", "Amplify", "Mortal Blast", "Mass Affliction", "Void"] }
+        {
+          "name": "PvE",
+          "skills": [
+            "Summon Spirit Hunter",
+            "Dimensional Bolt",
+            "Hex",
+            "Spirit Shred",
+            "Disintegrate",
+            "Soul Flare",
+            "Amplify",
+            "Mortal Blast",
+            "Mass Affliction",
+            "Void"
+          ]
+        }
       ],
       "rotations": [
-        ["Одна цель", "Dimensional Bolt → Hex → Spirit Shred → Disintegrate → Soul Flare → Amplify → Mortal Blast, чтобы добить"],
-        ["AoE", "Spirit Shred (вешает Spirit Shard) → Hex → Mortal Blast (разносит дебафф) → Mass Affliction → Soul Flare → Void"]
+        [
+          "Одна цель",
+          "Dimensional Bolt → Hex → Spirit Shred → Disintegrate → Soul Flare → Amplify → Mortal Blast, чтобы добить"
+        ],
+        [
+          "AoE",
+          "Spirit Shred (вешает Spirit Shard) → Hex → Mortal Blast (разносит дебафф) → Mass Affliction → Soul Flare → Void"
+        ]
       ],
       "stamina": null,
       "stamina_text": "В гайде дерево Stamina помечено как сломанное: бери левую часть, потом середину.",
@@ -174,6 +487,9 @@
     }
   ],
   "sources": [
-    ["MetaBattle: Ashes of Creation Builds", "https://metabattle.com/aoc/Ashes_of_Creation_Builds"]
+    [
+      "MetaBattle: Ashes of Creation Builds",
+      "https://metabattle.com/aoc/Ashes_of_Creation_Builds"
+    ]
   ]
 }

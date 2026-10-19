@@ -268,7 +268,7 @@
       pre ? [h("p", null, rich(pre.text)), plan(ST, { name: pre.name, skills: pre.skills })] : h("p", null, rich(c.stamina_text || "")),
       h("h2", null, "Советы"),
       h("ul", { class: "doc-list" }, c.tips.map((t) => h("li", null, rich(t)))),
-      h("p", { class: "small muted" }, "Источник: ", h("a", { href: c.source, target: "_blank", rel: "noopener noreferrer" }, "MetaBattle"), ". Названия навыков — как в игре."),
+      h("p", { class: "small muted" }, "Источник: ", [].concat(c.source).map((u, i) => [i ? ", " : "", h("a", { href: u, target: "_blank", rel: "noopener noreferrer" }, "MetaBattle: " + (/PvE/.test(u) ? "PvE" : /PvP/.test(u) ? "PvP" : "прокачка"))]), ". Названия навыков — как в игре."),
       B.note ? h("p", { class: "doc-note" }, rich(B.note)) : null);
   }
 

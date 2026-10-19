@@ -44,7 +44,7 @@
       "h": "Новости",
       "items": [
         { "name": "GameFragger: игра снова играбельна", "url": "https://gamefragger.com/multiplatform/massively-multiplayer/ashes-of-creation-is-playable-again-months-after-intrepid-studios-shut-down-thanks-to-a-fan-server-a29891", "what": "Статья про Evolve: как зайти и какие ограничения.", "status": "17.10.2026" },
-        { "name": "Ashes Moments", "url": "https://ashesmoments.substack.com/", "what": "Рассылка и новости по игре: билды, ротации, разборы." },
+        { "name": "Ashes Moments", "url": "https://ashesmoments.substack.com/", "what": "Рассылка и новости по игре: ротации, лор, патчноуты, разборы." },
         { "name": "Wikipedia: Ashes of Creation", "url": "https://en.wikipedia.org/wiki/Ashes_of_Creation", "what": "История игры." }
       ]
     }
