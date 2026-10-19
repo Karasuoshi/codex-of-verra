@@ -1,10 +1,10 @@
-/* Codex of Verra — static reader for Ashes of Creation design data.
-   No build step: reads JSON from data/, hash routes (#/...), runs on GitHub Pages. */
+/* Codex of Verra — party notes for Ashes of Creation (Russian UI).
+   No build step: reads JSON from data/ (generated) and content/ (hand-written pages), hash routes (#/...), runs on GitHub Pages. */
 (function () {
   "use strict";
 
   const SVG = "http://www.w3.org/2000/svg";
-  const nf = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+  const nf = new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 });
   const fmt = (v) => (typeof v === "number" ? nf.format(v) : v);
   const main = document.getElementById("main");
   const nav = document.getElementById("nav");
@@ -32,28 +32,24 @@
   const cache = new Map();
   function load(path) {
     if (!cache.has(path)) {
-      cache.set(path, fetch("data/" + path).then((r) => {
-        if (!r.ok) throw new Error("Could not load data/" + path + " (HTTP " + r.status + ")");
+      const url = path.startsWith("content/") ? path : "data/" + path;
+      cache.set(path, fetch(url).then((r) => {
+        if (!r.ok) throw new Error("Не удалось загрузить " + url + " (HTTP " + r.status + ")");
         return r.json();
       }).catch((e) => { cache.delete(path); throw e; }));
     }
     return cache.get(path);
   }
-  // Only these parts of the codex are open for now; everything else is shown but not clickable.
-  const OPEN = /^(|classes(\/.*)?|skills(\/.*)?|xp(\/.*)?|improvements(\/.*)?)$/;
+  // Routes that exist on the site. Anything else (the old raw database under db/) is rendered as plain text.
+  const OPEN = /^(|start|leveling|builds(\/.*)?|links|classes(\/.*)?|skills(\/.*)?|xp(\/.*)?|improvements(\/.*)?)$/;
   const isOpen = (to) => OPEN.test(String(to).split("?")[0]);
   const link = (to, text, cls) => isOpen(to) ? h("a", { href: "#/" + to, class: cls }, text)
-    : h("span", { class: "locked" + (cls ? " " + cls : ""), title: "Coming soon" }, text);
+    : h("span", { class: "locked" + (cls ? " " + cls : "") }, text);
   const icon = (src, cls) => src ? h("img", { src, alt: "", class: "ic" + (cls ? " " + cls : ""), loading: "lazy", decoding: "async" }) : null;
-  const section = (id) => INDEX.sections.find((x) => x.id === id) || { id, title: id };
 
-  // Legacy and test records are hidden unless the reader turns them on.
-  let showDev = false;
-  try { showDev = localStorage.getItem("cov.dev") === "1"; } catch (e) { /* storage blocked */ }
-  function setDev(v) { showDev = v; try { localStorage.setItem("cov.dev", v ? "1" : "0"); } catch (e) { /* ignore */ } }
 
   function setPage(title, ...content) {
-    document.title = title ? title + " · Codex of Verra" : "Codex of Verra";
+    document.title = title ? title + " · Codex of Verra" : "Codex of Verra — заметки пати по Ashes of Creation";
     main.replaceChildren(h("div", { class: "page" }, content));
     main.focus({ preventScroll: true });
     window.scrollTo(0, 0);
@@ -91,7 +87,7 @@
     }
     const d = points.map((p, i) => (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1)).join(" ");
     svg.append(s("path", { d: d + ` L${X(x1)} ${Y(0)} L${X(x0)} ${Y(0)} Z`, class: "area" }), s("path", { d, class: "line" }));
-    const readout = h("p", { class: "readout", "aria-live": "polite" }, "Hover or tap a point to read its value.");
+    const readout = h("p", { class: "readout", "aria-live": "polite" }, "Наведи или нажми на точку, чтобы увидеть значение.");
     const dots = points.map((p) => {
       const c = s("circle", { cx: X(p[0]), cy: Y(p[1]), r: points.length > 30 ? 3.5 : 5, class: "dot", tabindex: 0 });
       const show = () => { dots.forEach((o) => o.classList.remove("on")); c.classList.add("on"); readout.replaceChildren(...opts.describe(p[0], p[1])); };
@@ -108,7 +104,7 @@
       svg.append(s("line", { x1: L, x2: W - R, y1: Y(y), y2: Y(y), class: "grid" }));
       const t = s("text", { x: L - 8, y: Y(y) + 4, "text-anchor": "end", class: "axis-label" }); t.textContent = fmt(+y.toFixed(2)); svg.append(t);
     }
-    const readout = h("p", { class: "readout", "aria-live": "polite" }, "Tap a bar to read its value.");
+    const readout = h("p", { class: "readout", "aria-live": "polite" }, "Нажми на столбец, чтобы увидеть значение.");
     const bars = points.map((p, i) => {
       const x = L + i * bw;
       const r = s("rect", { x: x + bw * 0.15, width: bw * 0.7, y: Y(p[1]), height: Math.max(0, Y(0) - Y(p[1])), class: "bar", tabindex: 0 });
@@ -128,13 +124,11 @@
 
   // ——— shell ———
   function buildNav() {
-    const groups = [["Classes & skills", [["classes", "Classes"], ["skills", "Skill trees"], ["xp", "Experience"], ["improvements", "Possible Improvements"]]],
-      ["Coming soon", ["items", "creatures", "recipes", "loot", "quests", "places", "abilities", "effects", "lore", "formulas"]]];
-    const has = (id) => Array.isArray(id) || INDEX.sections.some((x) => x.id === id);
-    nav.replaceChildren(
-      link("", "Home"),
-      ...groups.map(([g, ids]) => [h("span", { class: "nav-group" }, g),
-        ids.filter(has).map((id) => Array.isArray(id) ? link(id[0], id[1]) : h("span", { class: "nav-soon", title: "Coming soon" }, section(id).title))]).flat(2));
+    const groups = [["Играть", [["start", "Где качать"], ["leveling", "Прокачка"], ["builds", "Билды"]]],
+      ["Справочник", [["classes", "Классы"], ["skills", "Деревья навыков"], ["xp", "Опыт"]]],
+      ["Сообщество", [["links", "Ссылки"]]]];
+    nav.replaceChildren(link("", "Главная"),
+      ...groups.map(([g, items]) => [h("span", { class: "nav-group" }, g), items.map(([id, n]) => link(id, n))]).flat(2));
   }
   function markNav(route) {
     nav.querySelectorAll("a").forEach((a) => {
@@ -145,71 +139,137 @@
   }
 
   // ——— home ———
+  const homeCard = (to, title, count, blurb) => h("li", null, h("a", { href: "#/" + to, class: "card" },
+    h("span", { class: "card-title" }, title), count ? h("span", { class: "card-count" }, count) : h("span"), h("span", { class: "card-blurb" }, blurb)));
   async function pageHome() {
-    const total = INDEX.sections.reduce((a, b) => a + b.count, 0);
-    const search = h("input", { type: "search", id: "home-search", placeholder: "Search opens soon", "aria-label": "Search the codex", disabled: true });
     setPage("",
       h("section", { class: "hero" },
-        h("p", { class: "hero-kicker" }, "A field guide to the world of Verra"),
+        h("p", { class: "hero-kicker" }, "Заметки нашей пати по Ashes of Creation"),
         h("h1", null, "Codex of Verra"),
-        h("p", { class: "lede" }, "Items, creatures, recipes, loot tables and game formulas, read straight from the Ashes of Creation design data."),
-        h("div", { class: "wip", role: "status" }, h("b", null, "Work in progress."), " The codex is being built. More information will appear here soon."),
-        h("div", { class: "hero-search" }, search, h("button", { type: "button", class: "btn", disabled: true }, "Search")),
-        h("p", { class: "meta" }, fmt(total) + " entries · " + INDEX.source)),
+        h("p", { class: "lede" }, "Где скачать игру и как зайти на сервер, как качаться, какие брать билды. Плюс справочник по классам и деревьям навыков из данных игры."),
+        h("div", { class: "wip", role: "status" }, h("b", null, "Сайт для своих."), " Пишем по ходу игры. Нашли ошибку или есть что добавить — говорите, поправим.")),
+      h("h2", { class: "home-h" }, "С чего начать"),
       h("ul", { class: "cards" },
-        h("li", null, h("a", { href: "#/classes", class: "card" },
-          h("span", { class: "card-title" }, "Classes"), h("span", { class: "card-count" }, "8"), h("span", { class: "card-blurb" }, "Tank, Fighter, Rogue, Ranger, Mage, Cleric, Summoner and Bard with their abilities."))),
-        h("li", null, h("a", { href: "#/skills", class: "card" },
-          h("span", { class: "card-title" }, "Skill trees"), h("span", { class: "card-count" }, "23"), h("span", { class: "card-blurb" }, "Archetype, weapon and stamina trees in the in-game style. Plan a build and share it."))),
-        h("li", null, h("a", { href: "#/improvements", class: "card" }, h("span", { class: "card-title" }, "Possible Improvements"), h("span", { class: "card-blurb" }, "Independent community proposals for expanding Verra. Explore Guild Championships."))),
-        INDEX.xp ? h("li", null, h("a", { href: "#/xp", class: "card" },
-          h("span", { class: "card-title" }, "Experience"), h("span", { class: "card-count" }, "XP"), h("span", { class: "card-blurb" }, "Experience curves for character, artisan skills, weapons and guilds."))) : null,
-        INDEX.sections.map((x) => h("li", null, h("div", { class: "card soon", "aria-disabled": "true" },
-          h("span", { class: "card-title" }, x.title), h("span", { class: "card-count" }, "Soon"), h("span", { class: "card-blurb" }, x.blurb))))),
-      h("section", { class: "notes" },
-        h("h2", null, "About this data"),
-        h("p", null, "Everything here comes from the design-data cache that shipped with the last Early Access client (January 2026). Drop sources are shown where the data links them: quests, recipes, gathering, events, containers, zones, points of interest and some creatures."),
-        h("p", null, "Most creature-specific loot tables are not linked to their creatures in the client data, so creature drops are incomplete until we confirm them in game. Legacy and test records are hidden by default; turn them on in any list.")),
-      h("footer", { class: "foot" }, "Codex of Verra is an independent, non-commercial fan project. It is not affiliated with or endorsed by Intrepid Studios. Ashes of Creation is a trademark of its owner."));
+        homeCard("start", "Где качать и как зайти", "1", "Клиент из Steam, сервер Evolve, лаунчер Companion: по шагам."),
+        homeCard("leveling", "Прокачка", "2", "Опыт и группа, маршрут 1–25, свитки, оружие и профессии."),
+        homeCard("builds", "Билды", "3", "Стартовые билды всех 8 классов с ротациями и ссылкой в планировщик."),
+        homeCard("links", "Полезные ссылки", null, "Другие проекты: сервер, гайды, базы, калькуляторы, новости.")),
+      h("h2", { class: "home-h" }, "Справочник"),
+      h("ul", { class: "cards" },
+        homeCard("classes", "Классы", "8", "Tank, Fighter, Rogue, Ranger, Mage, Cleric, Summoner и Bard: все способности с маной, кулдаунами и дальностью."),
+        homeCard("skills", "Деревья навыков", "23", "Деревья архетипов, оружия и выносливости как в игре. Собери билд и поделись ссылкой."),
+        INDEX.xp ? homeCard("xp", "Опыт", "XP", "Сколько опыта нужно на уровень: персонаж, оружие, ремесло, гильдия.") : null),
+      h("footer", { class: "foot" }, "Codex of Verra — некоммерческий фанатский проект. Не связан с Intrepid Studios. Ashes of Creation — товарный знак своего владельца. Справочник собран из данных клиента Early Access (январь 2026)."));
   }
 
-  // ——— lists ———
-  function listView(rows, opts) {
-    const ul = h("ul", { class: opts.icons ? "records with-ic" : "records" });
-    const counter = h("span", { class: "count", "aria-live": "polite" });
-    const q = h("input", { type: "search", id: "list-search", placeholder: opts.placeholder || "Filter by name or internal name", "aria-label": "Filter", value: opts.q || "" });
-    const dev = h("input", { type: "checkbox", id: "list-dev", checked: showDev });
-    const onlySrc = opts.hasSourceLabel ? h("input", { type: "checkbox", id: "list-src" }) : null;
-    const render = () => {
-      const words = q.value.toLowerCase().split(/\s+/).filter(Boolean);
-      const hits = rows.filter((r) => (dev.checked || !r.d) && (!onlySrc || !onlySrc.checked || r.o) &&
-        words.every((w) => (r.n || "").toLowerCase().includes(w) || (r.q || "").includes(w) || (r.s || "").toLowerCase().includes(w)));
-      const shown = hits.slice(0, 400);
-      ul.replaceChildren(...(shown.length ? shown.map((r) => h("li", null, h("a", { href: "#/" + (r.sec || opts.sec) + "/" + encodeURIComponent(r.id), class: r.d ? "dev" : null },
-        h("span", { class: "name" }, opts.icons ? (r.ic ? icon(r.ic) : h("span", { class: "ic none", "aria-hidden": "true" })) : null, h("span", null, r.n || "Unnamed")), r.d ? h("span", { class: "tag" }, "legacy/test") : null,
-        h("span", { class: "sub" }, (r.secTitle ? r.secTitle + " · " : "") + (r.s || "")))))
-        : [h("li", { class: "empty" }, "Nothing matches. Try part of a name, an internal name like Gear_Armor, or turn on legacy entries.")]));
-      counter.textContent = fmt(hits.length) + (hits.length > shown.length ? " found, first " + shown.length + " shown" : " found");
+  // ——— hand-written pages (content/*.json) ———
+  // Inline markup in content strings: **bold**, `code`, [text](url). External links open in a new tab.
+  function rich(str) {
+    const out = []; const re = /\*\*([^*]+)\*\*|`([^`]+)`|\[([^\]]+)\]\(([^)\s]+)\)/g; let pos = 0, m;
+    while ((m = re.exec(str))) {
+      if (m.index > pos) out.push(str.slice(pos, m.index));
+      if (m[1]) out.push(h("b", null, m[1]));
+      else if (m[2]) out.push(h("code", null, m[2]));
+      else {
+        const u = m[4], ext = /^https?:/.test(u);
+        out.push(h("a", { href: u, target: ext ? "_blank" : null, rel: ext ? "noopener noreferrer" : null }, m[3]));
+      }
+      pos = m.index + m[0].length;
+    }
+    if (pos < str.length) out.push(str.slice(pos));
+    return out;
+  }
+  const paras = (arr) => (arr || []).map((t) => h("p", null, rich(t)));
+  function docBlock(b) {
+    return h("section", { class: "doc-block" },
+      b.h ? h("h2", null, b.h) : null,
+      paras(b.p),
+      b.list ? h("ul", { class: "doc-list" }, b.list.map((t) => h("li", null, rich(t)))) : null,
+      b.steps ? h("ol", { class: "doc-steps" }, b.steps.map((t) => h("li", null, rich(t)))) : null,
+      b.table ? table(b.table.head, b.table.rows.map((r) => r.map((c) => h("span", null, rich(String(c)))))) : null,
+      paras(b.after),
+      b.note ? h("p", { class: "doc-note" }, rich(b.note)) : null);
+  }
+  function sourcesList(src) {
+    return src && src.length ? h("section", { class: "doc-sources" }, h("h2", null, "Источники"),
+      h("ul", null, src.map(([t, u]) => h("li", null, h("a", { href: u, target: "_blank", rel: "noopener noreferrer" }, t))))) : null;
+  }
+  const updated = (d) => d ? h("p", { class: "meta" }, "Обновлено " + d.split("-").reverse().join(".")) : null;
+  async function pageDoc(name) {
+    const D = await load("content/" + name + ".json");
+    setPage(D.title, h("p", { class: "crumbs" }, link("", "Главная")), h("h1", null, D.title), h("p", { class: "lede small" }, rich(D.lede)), updated(D.updated),
+      D.blocks.map(docBlock), sourcesList(D.sources));
+  }
+  async function pageLinks() {
+    const D = await load("content/links.json");
+    setPage(D.title, h("p", { class: "crumbs" }, link("", "Главная")), h("h1", null, D.title), h("p", { class: "lede small" }, rich(D.lede)), updated(D.updated),
+      D.groups.map((g) => h("section", { class: "doc-block" }, h("h2", null, g.h),
+        h("ul", { class: "linkcards" }, g.items.map((it) => h("li", { class: "linkcard" },
+          h("div", { class: "lc-head" }, h("a", { href: it.url, target: "_blank", rel: "noopener noreferrer", class: "lc-name" }, it.name),
+            it.status ? h("span", { class: "tag" + (it.status === "закрыт" ? " off" : "") }, it.status) : null),
+          h("span", { class: "lc-host" }, it.url.replace(/^https?:\/\//, "").replace(/\/$/, "")),
+          h("p", null, rich(it.what))))))),
+      D.add ? h("p", { class: "doc-note" }, rich(D.add)) : null);
+  }
+
+  // ——— builds ———
+  // A build lists skill names; they are matched to tree nodes (or options of a choice node) and their prerequisites are added.
+  function buildCode(T, names) {
+    const N = T.nodes, pick = new Map(), missing = [];
+    names.forEach((nm) => {
+      let hit = null;
+      for (let i = 0; i < N.length && !hit; i++) {
+        const d = N[i];
+        if (d.k !== "c" && d.n === nm) hit = [i, null];
+        else if (d.k === "c") d.opts.forEach((o, j) => { if (!hit && o.n === nm) hit = [i, j]; });
+      }
+      if (hit) pick.set(hit[0], hit[1]); else missing.push(nm);
+    });
+    const addPre = (i) => (N[i].pre || []).forEach((p) => { if (!pick.has(p)) { pick.set(p, N[p].k === "c" ? 0 : null); addPre(p); } });
+    [...pick.keys()].forEach(addPre);
+    let pts = 0;
+    pick.forEach((c, i) => { const v = c != null && N[i].opts ? N[i].opts[c] : N[i]; pts += v.c || N[i].c || 1; });
+    const code = [...pick.keys()].sort((a, b) => a - b).map((i) => i + (pick.get(i) != null ? "c" + pick.get(i) : "")).join(".");
+    return { code, pts, missing };
+  }
+  async function pageBuilds(id) {
+    const B = await load("content/builds.json");
+    const crumbs = h("p", { class: "crumbs" }, link("", "Главная"), id ? [" / ", link("builds", "Билды")] : null);
+    const switcher = h("nav", { class: "tabs", "aria-label": "Классы" }, B.classes.map((c) => h("a", { href: "#/builds/" + c.id, "aria-current": c.id === id ? "page" : null }, c.name)));
+    if (!id) {
+      return setPage(B.title, crumbs, h("h1", null, B.title), h("p", { class: "lede small" }, rich(B.lede)), updated(B.updated),
+        B.note ? h("p", { class: "doc-note" }, rich(B.note)) : null,
+        h("ul", { class: "cards" }, B.classes.map((c) => h("li", null, h("a", { href: "#/builds/" + c.id, class: "card" },
+          h("span", { class: "card-title" }, c.name), h("span", { class: "card-count" }, c.difficulty), h("span", { class: "card-blurb" }, c.role + ". " + c.weapons))))),
+        sourcesList(B.sources));
+    }
+    const c = B.classes.find((x) => x.id === id);
+    if (!c) return pageMissing();
+    const T = await load("trees/" + c.id + ".json");
+    const ST = c.stamina ? await load("trees/stamina.json") : null;
+    const pre = c.stamina ? B.stamina_presets[c.stamina] : null;
+    const plan = (tree, b, budget) => {
+      const r = buildCode(tree, b.skills);
+      return h("div", { class: "plan" },
+        h("div", { class: "plan-head" }, h("h3", null, b.name),
+          h("span", { class: "plan-pts" + (budget && r.pts > budget ? " over" : "") }, r.pts + (budget ? " из " + budget : "") + " очк."),
+          h("a", { class: "st-btn primary", href: "#/skills/" + tree.id + (r.code ? "?b=" + r.code : "") }, "Открыть в планировщике")),
+        h("ul", { class: "chips" }, b.skills.map((n) => h("li", { class: r.missing.includes(n) ? "miss" : null, title: r.missing.includes(n) ? "Нет в дереве клиента" : null }, n))),
+        budget && r.pts > budget ? h("p", { class: "small warn" }, "Больше, чем даёт 25-й уровень: выбери главное.") : null);
     };
-    q.addEventListener("input", render);
-    dev.addEventListener("change", () => { setDev(dev.checked); render(); });
-    if (onlySrc) onlySrc.addEventListener("change", render);
-    render();
-    return [h("div", { class: "filters" }, q,
-      h("label", { class: "check" }, dev, " Show legacy & test"),
-      onlySrc ? h("label", { class: "check" }, onlySrc, " " + opts.hasSourceLabel) : null, counter), ul];
-  }
-  async function pageList(sec, q) {
-    const meta = section(sec);
-    if (!INDEX.sections.some((x) => x.id === sec)) return pageMissing();
-    const rows = await load(sec + ".json");
-    const extra = { items: "Has a known source", creatures: "Has known loot", places: "Has drops" }[sec];
-    setPage(meta.title, h("p", { class: "crumbs" }, link("", "Codex")), h("h1", null, meta.title), h("p", { class: "lede small" }, meta.blurb),
-      listView(rows, { sec: "db/" + sec, q, hasSourceLabel: extra, icons: ["items", "abilities", "effects", "recipes"].includes(sec) }));
-  }
-  async function pageSearch(q) {
-    const all = await Promise.all(INDEX.sections.map((x) => load(x.id + ".json").then((rows) => rows.map((r) => ({ ...r, sec: "db/" + x.id, secTitle: x.title })))));
-    setPage("Search", h("p", { class: "crumbs" }, link("", "Codex")), h("h1", null, "Search"), listView(all.flat(), { q, placeholder: "Search everything", icons: true }));
+    setPage(c.name + " — билд", crumbs, h("h1", null, c.name), switcher,
+      h("dl", { class: "facts" }, h("dt", null, "Роль"), h("dd", null, c.role), h("dt", null, "Сложность"), h("dd", null, c.difficulty), h("dt", null, "Оружие"), h("dd", null, rich(c.weapons))),
+      h("h2", null, "Навыки архетипа"),
+      h("p", { class: "small muted" }, "Отмечены ключевые навыки и всё, что нужно для их открытия. На 25-м уровне — 24 очка архетипа."),
+      c.builds.map((b) => plan(T, b, 24)),
+      h("h2", null, "Ротации"),
+      h("div", { class: "rot" }, c.rotations.map(([n, t]) => h("div", { class: "rot-row" }, h("b", null, n), h("p", null, rich(t))))),
+      h("h2", null, "Выносливость (Stamina)"),
+      pre ? [h("p", null, rich(pre.text)), plan(ST, { name: pre.name, skills: pre.skills })] : h("p", null, rich(c.stamina_text || "")),
+      h("h2", null, "Советы"),
+      h("ul", { class: "doc-list" }, c.tips.map((t) => h("li", null, rich(t)))),
+      h("p", { class: "small muted" }, "Источник: ", h("a", { href: c.source, target: "_blank", rel: "noopener noreferrer" }, "MetaBattle"), ". Названия навыков — как в игре."),
+      B.note ? h("p", { class: "doc-note" }, rich(B.note)) : null);
   }
 
   // ——— record pages ———
@@ -227,175 +287,69 @@
     if (/^(hit|linger|init)/.test(t)) return "amount";
     return "value";
   }
-  const ph = (kind, tok) => h("span", { class: "ph", title: "Filled in by the game: " + tok + " (not decoded yet)" }, kind);
+  const PH_RU = { cooldown: "перезарядка", charges: "заряды", duration: "длительность", "per tick": "за тик", "stat bonus": "бонус стата", effect: "эффект", amount: "величина", value: "значение" };
+  const ph = (kind, tok) => h("span", { class: "ph", title: "Значение подставляет игра: " + tok + " (ещё не расшифровано)" }, PH_RU[kind] || kind);
   function segNodes(segs) {
     return segs.map((x) => typeof x === "string" ? x
       : x.v ? h("span", { class: /healing/.test(x.v) ? "num heal" : "num" }, x.v)
-      : x.e ? link("db/effects/" + x.e, x.n, "fx")
+      : x.e ? h("span", { class: "fx" }, x.n)
       : x.p ? ph(x.p, x.t) : h("span", { class: "fx" }, x.n));
   }
-  function descText(text) {
-    const out = []; let pos = 0; const re = /\$([^$\s]{1,80})\$/g; let m;
-    while ((m = re.exec(text))) {
-      if (m.index > pos) out.push(text.slice(pos, m.index));
-      const em = /^effect:([A-Za-z0-9_]+)/i.exec(m[1]);
-      out.push(em ? { n: em[1].replace(/^Status_/, "").replace(/_/g, " ") } : { p: phKind(m[1]), t: m[1] });
-      pos = m.index + m[0].length;
-    }
-    if (pos < text.length) out.push(text.slice(pos));
-    return segNodes(out);
-  }
-  function header(sec, d, sub) {
-    return [h("p", { class: "crumbs" }, link("", "Codex"), " / ", link("db/" + sec, section(sec).title)),
-      d.ic ? h("div", { class: "title-row" }, icon(d.ic, "big"), h("h1", null, d.title || d.name || "Unnamed")) : h("h1", null, d.title || d.name || "Unnamed"), d.dev ? h("p", { class: "warn" }, "Legacy or test record. It may not exist in the live game.") : null,
-      sub ? h("p", { class: "sub-head" }, sub) : null,
-      d.description ? h("p", { class: "desc" }, d.x ? segNodes(d.x) : sec === "abilities" || sec === "effects" ? descText(d.description) : d.description) : null,
-      (d.more || []).filter(Boolean).length ? h("div", { class: "more" }, d.more.filter(Boolean).map((t) => h("p", null, t))) : null];
-  }
-  const linkList = (items, empty) => items && items.length
-    ? h("ul", { class: "chips" }, items.map((i) => h("li", null, i.link ? link(i.link.replace(/^(\w+)\//, "db/$1/"), [icon(i.ic, "sm"), i.name || "Unnamed"]) : i.name)))
-    : h("p", { class: "muted" }, empty);
-  const tableLinks = (names) => names && names.length ? h("p", { class: "small muted" }, "Loot tables: ", names.map((n, i) => [i ? ", " : "", h("a", { href: "#/search?q=" + encodeURIComponent(n) }, n)])) : null;
-
-  function sourcesBlock(d) {
-    const vis = d.sources.filter((x) => showDev || !x.d);
-    if (!vis.length) return h("p", { class: "muted" }, d.sources.length ? "Only legacy or test sources. Turn on legacy entries in a list to see them." : "No source is linked in the client data. It may come from a creature whose loot link is not shipped with the client.");
-    const groups = {};
-    vis.forEach((x) => (groups[x.kind] = groups[x.kind] || []).push(x));
-    return h("div", { class: "sources" }, Object.entries(groups).map(([k, arr]) => h("details", { class: "src-group", open: arr.length <= 12 },
-      h("summary", null, h("span", null, k), h("span", { class: "count" }, arr.length)),
-      h("ul", { class: "src-list" }, arr.map((x) => h("li", null,
-        h("div", { class: "src-name" }, x.link ? link(x.link.replace(/^(\w+)\//, "db/$1/"), x.name || x.internal) : (x.name || x.internal), x.qty && x.qty !== "1" ? h("span", { class: "qty" }, "× " + x.qty) : null),
-        x.path ? h("ol", { class: "path" }, x.path.map((p) => h("li", null, mono(p.table), p.rule ? h("span", { class: "rule" }, p.rule) : null, p.notes.map((n) => h("span", { class: "note" }, n))))) : null))))),
-      d.sources_total > d.sources.length ? h("p", { class: "small muted" }, "Showing " + d.sources.length + " of " + d.sources_total + " sources.") : null);
-  }
-
-  const renderers = {
-    items: (d) => [header("items", d, d.internal),
-      h("h2", null, "Obtained from"), sourcesBlock(d),
-      d.contains.length ? [h("h2", null, "Contains"), linkList(d.contains), tableLinks(d.contains_tables)] : null,
-      h("h2", null, "Record"), dl([["Internal name", mono(d.internal)], ["GUID", mono(d.guid)]])],
-    creatures: (d) => [header("creatures", d),
-      h("h2", null, "Known loot"), linkList(d.loot, "No loot is linked to this creature in the client data."), tableLinks(d.loot_tables),
-      h("h2", null, "Spawn and definition records"), h("ul", { class: "plain mono small" }, d.internal_names.map((n) => h("li", null, n))),
-      d.internal_total > d.internal_names.length ? h("p", { class: "small muted" }, d.internal_total + " records in total.") : null],
-    recipes: (d) => [header("recipes", d, d.internal), h("h2", null, "Produces"), linkList(d.outputs, "No output items."), tableLinks(d.loot_tables),
-      h("p", { class: "small muted" }, "Ingredients and station requirements are not decoded yet.")],
-    quests: (d) => [header("quests", d, d.internal), h("h2", null, "Item rewards"), linkList(d.rewards, "No item rewards are linked."), tableLinks(d.reward_tables)],
-    places: (d) => [header("places", d, d.kind + " · " + d.internal), h("h2", null, "Drops in this area"), linkList(d.loot, "No area-wide drops."), tableLinks(d.loot_tables)],
-    abilities: (d) => {
-      const cls = CLASS_OF[(d.internal || "").split("_")[0]];
-      return [header("abilities", d, d.internal),
-        cls ? h("p", null, h("span", { class: "tag" }, "Class"), " ", link("classes/" + cls[0], cls[1])) : null,
-        d.st ? [statLine(d.st), d.st.m != null ? levelPicker() : null] : null,
-        /\$[^$\s]+\$/.test(d.description || "") ? h("p", { class: "small muted" }, "Dotted labels mark numbers and effects the game fills in. They are not decoded yet.") : null];
-    },
-    effects: (d) => [header("effects", d, d.internal)],
-    lore: (d) => [header("lore", d, d.internal)],
-    formulas: (d) => [header("formulas", d), h("pre", { class: "code" }, d.expression || "—")],
-    loot: (d) => [header("loot", { ...d, title: d.name }, "Loot table"), lootTree(d), h("h2", null, "Used by"),
-      d.used_by.length ? h("ul", { class: "src-list" }, d.used_by.map((x) => h("li", null, h("span", { class: "tag" }, x.kind), " ", x.link ? link(x.link.replace(/^(\w+)\//, "db/$1/"), x.name || x.internal) : (x.name || x.internal))))
-        : h("p", { class: "muted" }, "Nothing references this table directly. It is either a subtable of another table or assigned by a rule that is not in the client data.")],
-  };
-
-  function lootTree(t) {
-    const kids = [];
-    if (t.predicate) kids.push(h("p", { class: "cond" }, "Only if ", mono(t.predicate)));
-    (t.containers || []).forEach((c, ci) => {
-      const total = (c.weights || []).reduce((a, b) => a + b, 0);
-      kids.push(h("div", { class: "roll" }, h("h3", null, "Roll " + (ci + 1), h("span", { class: "rule" }, c.selection), c.number_to_select ? h("span", { class: "note" }, "pick " + c.number_to_select) : null),
-        c.predicate ? h("p", { class: "cond" }, "Only if ", mono(c.predicate)) : null,
-        h("ul", { class: "rewards" }, c.rewards.map((r, i) => h("li", null,
-          (r.items || []).map((it) => h("div", null, link("db/items/" + it.item.guid, [icon(it.item.ic, "sm"), it.item.item || it.item.internal_name || it.item.guid]), h("span", { class: "qty" }, "× " + it.quantity))),
-          (r.currency || []).map((cu) => h("div", null, "Currency ", h("span", { class: "qty" }, cu.amount))),
-          (r.experience || []).map((x) => h("div", { class: "muted" }, x.type + " XP ", h("span", { class: "qty" }, x.value))),
-          c.weights && c.weights[i] != null ? h("span", { class: "note" }, "weight " + c.weights[i] + "/" + total) : null,
-          c.drop_percent && c.drop_percent[i] ? h("span", { class: "note" }, "chance " + c.drop_percent[i]) : null,
-          c.weight_expressions && c.weight_expressions[i] ? h("span", { class: "note" }, "weight " + c.weight_expressions[i]) : null)))));
-    });
-    const st = t.subtables;
-    if (st) {
-      const total = (st.weights || []).reduce((a, b) => a + b, 0);
-      kids.push(h("div", { class: "roll" }, h("h3", null, "Subtables", h("span", { class: "rule" }, st.selection), st.number_to_select ? h("span", { class: "note" }, "pick " + st.number_to_select) : null),
-        h("ul", { class: "rewards" }, st.tables.map((x, i) => h("li", null, h("a", { href: "#/db/loot/" + x.guid }, x.loot_table || x.guid),
-          st.weights && st.weights[i] != null ? h("span", { class: "note" }, "weight " + st.weights[i] + "/" + total) : null,
-          st.percent && st.percent[i] ? h("span", { class: "note" }, "chance " + st.percent[i]) : null,
-          st.weight_expressions && st.weight_expressions[i] ? h("span", { class: "note" }, "weight " + st.weight_expressions[i]) : null)))));
-    }
-    return h("div", { class: "tree" }, kids.length ? kids : h("p", { class: "muted" }, "This table grants nothing by itself."));
-  }
-
-  // Records are packed into shards; the shard is crc32(id) % shards, same as tools/build_site.py.
-  const CRC = (() => { const t = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
-  function crc32(str) {
-    const bytes = new TextEncoder().encode(str); let c = 0xffffffff;
-    for (const b of bytes) c = CRC[(c ^ b) & 0xff] ^ (c >>> 8);
-    return (c ^ 0xffffffff) >>> 0;
-  }
-  async function pageRecord(sec, id) {
-    if (!renderers[sec]) return pageMissing();
-    if (sec === "abilities" && !CURVE) { try { CURVE = (await load("classes.json")).mana_curve; } catch (e) { /* optional */ } }
-    const n = section(sec).shards || 1;
-    const shard = await load(sec + "/" + (crc32(String(id)) % n) + ".json");
-    const d = shard[id];
-    if (!d) return pageMissing();
-    setPage(d.title || d.name, renderers[sec](d));
-  }
-
   // ——— ability numbers ———
   let LEVEL = 50;
   try { LEVEL = Math.min(50, Math.max(1, parseInt(localStorage.getItem("cov.level") || "50", 10) || 50)); } catch (e) { /* storage blocked */ }
   let CURVE = null;
-  const secs = (v) => v >= 60 ? (Math.floor(v / 60) + " m" + (v % 60 ? " " + fmt(+(v % 60).toFixed(2)) + " s" : "")) : fmt(v) + " s";
+  const secs = (v) => v >= 60 ? (Math.floor(v / 60) + " мин" + (v % 60 ? " " + fmt(+(v % 60).toFixed(2)) + " с" : "")) : fmt(v) + " с";
+  const chRu = (v) => String(v).replace("(+2 with talent)", "(+2 с талантом)").replace(/with talent/g, "с талантом");
   const manaAt = (base, lvl) => CURVE && CURVE[lvl - 1] != null ? Math.ceil(base * CURVE[lvl - 1] / 32) : null;
   function statLine(st) {
     if (!st) return null;
     const parts = [];
     if (st.m != null) {
       const v = manaAt(st.m, LEVEL);
-      parts.push(h("span", { class: "stat mana", "data-base": st.m }, h("b", null, v != null ? v : "?"), " mana"));
+      parts.push(h("span", { class: "stat mana", "data-base": st.m }, h("b", null, v != null ? v : "?"), " маны"));
     }
-    if (st.cd) parts.push(h("span", { class: "stat" }, h("b", null, secs(st.cd)), " cooldown"));
-    if (st.ch) parts.push(h("span", { class: "stat" }, h("b", null, String(st.ch)), " charges"));
-    if (st.r) parts.push(h("span", { class: "stat" }, h("b", null, fmt(st.r) + " m"), " range"));
+    if (st.cd) parts.push(h("span", { class: "stat" }, "перезарядка ", h("b", null, secs(st.cd))));
+    if (st.ch) parts.push(h("span", { class: "stat" }, "заряды ", h("b", null, chRu(st.ch))));
+    if (st.r) parts.push(h("span", { class: "stat" }, "дальность ", h("b", null, fmt(st.r) + " м")));
     return parts.length ? h("p", { class: "stats" }, parts) : null;
   }
   function levelPicker(onChange) {
     const out = h("output", { for: "lvl" }, String(LEVEL));
-    const inp = h("input", { type: "range", id: "lvl", min: 1, max: 50, step: 1, value: LEVEL, "aria-label": "Character level" });
+    const inp = h("input", { type: "range", id: "lvl", min: 1, max: 50, step: 1, value: LEVEL, "aria-label": "Уровень персонажа" });
     inp.addEventListener("input", () => {
       LEVEL = +inp.value; out.textContent = String(LEVEL);
       try { localStorage.setItem("cov.level", String(LEVEL)); } catch (e) { /* ignore */ }
       document.querySelectorAll(".stat.mana").forEach((el) => { el.firstChild.textContent = manaAt(+el.dataset.base, LEVEL); });
       if (onChange) onChange();
     });
-    return h("div", { class: "level-pick" }, h("label", { for: "lvl" }, "Character level"), inp, out,
-      h("span", { class: "small muted" }, "Mana cost scales with level."));
+    return h("div", { class: "level-pick" }, h("label", { for: "lvl" }, "Уровень персонажа"), inp, out,
+      h("span", { class: "small muted" }, "Расход маны растёт с уровнем."));
   }
 
   // ——— classes ———
-  const CLASS_OF = { Tank: ["tank", "Tank"], "Tank-A1": ["tank", "Tank"], TankOld: ["tank", "Tank"], Fighter: ["fighter", "Fighter"],
-    Rogue: ["rogue", "Rogue"], "Rogue-old": ["rogue", "Rogue"], Ranger: ["ranger", "Ranger"], "Ranger-Old": ["ranger", "Ranger"], "Ranger-old": ["ranger", "Ranger"],
-    Mage: ["mage", "Mage"], "Mage-A1": ["mage", "Mage"], Cleric: ["cleric", "Cleric"], "Cleric-A1": ["cleric", "Cleric"], ClericOld: ["cleric", "Cleric"],
-    Summoner: ["summoner", "Summoner"], Bard: ["bard", "Bard"] };
+  const CLASS_RU = { tank: "Передняя линия: держит внимание врагов, защищает союзников и контролирует бой.",
+    fighter: "Урон в ближнем бою: быстро сближается и сильно бьёт.", rogue: "Скрытный боец ближнего боя: позиция, взрывной урон и ослабления.",
+    ranger: "Физический урон издалека: луки, ловушки и мобильность.", mage: "Магический урон издалека: огонь, лёд и заклинания по площади.",
+    cleric: "Хил: лечит и защищает группу, особенно силён против нежити.", summoner: "Призывает существ и сражается через них.",
+    bard: "Поддержка: песни усиливают союзников и ослабляют врагов." };
   function abilityCards(list) {
     return h("ul", { class: "abil" }, list.map((a) => h("li", null,
-      h("h3", null, link("db/abilities/" + a.id, [icon(a.ic, "sm"), a.n])),
+      h("h3", null, icon(a.ic, "sm"), a.n),
       statLine(a.st),
-      a.x ? h("p", { class: "desc" }, segNodes(a.x)) : h("p", { class: "muted small" }, "No description in the data."),
-      a.v ? h("p", { class: "small muted" }, "Other versions: ", a.v.map((id, i) => [i ? ", " : "", link("db/abilities/" + id, "#" + (i + 2))])) : null)));
+      a.x ? h("p", { class: "desc" }, segNodes(a.x)) : h("p", { class: "muted small" }, "Описания в данных нет."))));
   }
   async function pageClasses(id) {
     const C = await load("classes.json");
     CURVE = C.mana_curve || CURVE;
     const all = [...C.classes, ...C.kinds];
-    const crumbs = h("p", { class: "crumbs" }, link("", "Codex"), id ? [" / ", link("classes", "Classes")] : null);
-    const switcher = h("nav", { class: "tabs", "aria-label": "Classes" }, C.classes.map((c) => h("a", { href: "#/classes/" + c.id, "aria-current": c.id === id ? "page" : null }, c.name)));
+    const crumbs = h("p", { class: "crumbs" }, link("", "Главная"), id ? [" / ", link("classes", "Классы")] : null);
+    const switcher = h("nav", { class: "tabs", "aria-label": "Классы" }, C.classes.map((c) => h("a", { href: "#/classes/" + c.id, "aria-current": c.id === id ? "page" : null }, c.name)));
     if (!id) {
       const card = (c, n) => h("li", null, h("a", { href: "#/classes/" + c.id, class: "card" },
-        h("span", { class: "card-title" }, c.name), h("span", { class: "card-count" }, fmt(n)), h("span", { class: "card-blurb" }, c.blurb)));
-      return setPage("Classes", crumbs, h("h1", null, "Classes"),
-        h("p", { class: "lede small" }, "The eight archetypes and their abilities as they stood in the January 2026 build. Older Alpha versions are kept on each class page."),
+        h("span", { class: "card-title" }, c.name), h("span", { class: "card-count" }, fmt(n)), h("span", { class: "card-blurb" }, CLASS_RU[c.id] || c.blurb)));
+      return setPage("Классы", crumbs, h("h1", null, "Классы"),
+        h("p", { class: "lede small" }, "Восемь архетипов и их способности по данным клиента января 2026. Названия и описания — английские, как в игре. Готовые сборки — в разделе ", link("builds", "Билды"), "."),
         h("ul", { class: "cards" }, C.classes.map((c) => card(c, c.abilities.length))));
     }
     const c = C.classes.find((x) => x.id === id);
@@ -406,11 +360,12 @@
       h("summary", null, h("span", null, f.family), h("span", { class: "count" }, f.abilities.length)), abilityCards(f.abilities)));
     else body = [abilityCards(c.abilities),
       c.legacy.length ? h("details", { class: "src-group legacy" },
-        h("summary", null, h("span", null, isClass ? "Alpha and older versions" : "Older versions"), h("span", { class: "count" }, c.legacy.length)),
-        h("p", { class: "small muted" }, "Earlier designs of this kit. They may not exist in the live game."), abilityCards(c.legacy)) : null];
-    setPage(c.name, crumbs, h("h1", null, c.name), isClass ? switcher : null, h("p", { class: "lede small" }, c.blurb),
+        h("summary", null, h("span", null, "Старые версии (Alpha)"), h("span", { class: "count" }, c.legacy.length)),
+        h("p", { class: "small muted" }, "Ранние варианты способностей. В текущей игре их может не быть."), abilityCards(c.legacy)) : null];
+    setPage(c.name, crumbs, h("h1", null, c.name), isClass ? switcher : null, h("p", { class: "lede small" }, CLASS_RU[c.id] || c.blurb),
       isClass ? levelPicker() : null,
-      h("p", { class: "small muted" }, "Numbers come from the design data. Cast times are not in it yet; dotted labels mark values still being decoded."), body);
+      h("p", { class: "small muted" }, "Цифры — из данных игры. Времени каста там нет; пунктиром отмечены значения, которые ещё не расшифрованы."),
+      h("p", null, link("builds/" + c.id, "Билд для " + c.name + " →"), " · ", link("skills/" + c.id, "Дерево навыков →")), body);
   }
 
   // ——— skill trees (in-game style panel) ———
@@ -420,17 +375,18 @@
     const st = d.st;
     if (st) {
       const left = [], right = [];
-      if (st.m != null) left.push(h("div", { class: "tt-mana" }, h("span", { class: "stat mana", "data-base": st.m }, manaAt(st.m, LEVEL)), " Mana"));
-      if (st.r) left.push(h("div", null, fmt(st.r) + "m Range"));
-      if (st.cd) right.push(h("div", null, secs(st.cd).replace(/ /g, "") + " cooldown"));
-      if (st.ch) right.push(h("div", null, String(st.ch) + " Charges"));
+      if (st.m != null) left.push(h("div", { class: "tt-mana" }, h("span", { class: "stat mana", "data-base": st.m }, manaAt(st.m, LEVEL)), " маны"));
+      if (st.r) left.push(h("div", null, "Дальность " + fmt(st.r) + " м"));
+      if (st.cd) right.push(h("div", null, "Перезарядка " + secs(st.cd)));
+      if (st.ch) right.push(h("div", null, "Заряды: " + chRu(st.ch)));
       if (left.length || right.length) kids.push(h("div", { class: "tt-stats" }, h("div", null, left), h("div", { class: "tt-right" }, right)));
     }
     if (d.x) kids.push(h("p", { class: "tt-desc" }, segNodes(d.x)));
     return kids;
   }
   function costLine(d) {
-    return d.c || d.pt ? h("div", { class: "tt-cost" }, "Cost: " + (d.c || 1) + " ", h("span", { class: "pt-sq" }), " " + ((d.c || 1) > 1 ? (d.pt || "Skill Pt.").replace(/Pt\.$/, "Pts.") : (d.pt || "Skill Pt."))) : null;
+    const kind = /Weapon/.test(d.pt || "") ? "оружия" : /Stamina/.test(d.pt || "") ? "выносливости" : "архетипа";
+    return d.c || d.pt ? h("div", { class: "tt-cost" }, "Стоимость: " + (d.c || 1) + " ", h("span", { class: "pt-sq" }), " очк. " + kind) : null;
   }
   async function pageSkills(id) {
     const idx = await load("trees.json");
@@ -450,15 +406,16 @@
     N.forEach((d, k) => (d.pre || []).forEach((p) => kids[p] && kids[p].push(k)));
     const avail = (k) => (N[k].pre || []).every((p) => learned.has(p));
     const cost = (k) => { const d = N[k].k === "c" && chosen.has(k) ? N[k].opts[chosen.get(k)] : N[k]; return d.c || N[k].c || 1; };
-    const ptName = N.find((d) => d.pt) ? N.find((d) => d.pt).pt.replace(/ Pt\.$/, "") : "Skill";
+    const ptName = { Archetype: "архетипа", Weapon: "оружия", Stamina: "выносливости" }[T.group] || "";
     const unlearn = (k) => { learned.delete(k); chosen.delete(k); kids[k].forEach((c) => learned.has(c) && unlearn(c)); };
     const view = (k) => (N[k].k === "c" && chosen.has(k) ? N[k].opts[chosen.get(k)] : N[k]);
 
     const group = T.group;
+    const TAB_RU = { Archetype: "Архетип", Weapon: "Оружие", Stamina: "Выносливость" };
     const tabs = h("div", { class: "st-tabs", role: "tablist" }, ["Archetype", "Weapon", "Stamina"].map((g) => {
       const first = list.find((t) => t.group === g);
-      return h("a", { href: "#/skills/" + (g === group ? id : first.id), class: "st-tab", "aria-current": g === group ? "page" : null }, g, g === "Archetype" ? h("span", { class: "st-dia" }, "◆") : null);
-    }), h("span", { class: "st-tab off", title: "Coming soon" }, "Skill Book"));
+      return h("a", { href: "#/skills/" + (g === group ? id : first.id), class: "st-tab", "aria-current": g === group ? "page" : null }, TAB_RU[g], g === "Archetype" ? h("span", { class: "st-dia" }, "◆") : null);
+    }));
     const subs = group === "Stamina" ? null : h("div", { class: "st-sub" }, list.filter((t) => t.group === group).map((t) =>
       h("a", { href: "#/skills/" + t.id, class: "st-chip", "aria-current": t.id === id ? "page" : null }, icon(t.ic, "sm"), t.name)));
     // geometry: screenshot-led layouts for Cleric, Bard and Summoner.
@@ -521,18 +478,17 @@
     function tooltip(k) {
       const d = N[k], v = view(k);
       const isL = learned.has(k), ok = avail(k);
-      const action = !ok ? h("div", { class: "tt-hint warn" }, "Requires: " + d.pre.filter((p) => !learned.has(p)).map((p) => view(p).n).join(", "))
-        : d.k === "c" && !isL ? h("div", { class: "tt-hint" }, "Choose one option to learn it.")
-        : h("div", { class: "tt-actions" }, h("button", { type: "button", class: "tt-btn", onclick: (e) => { e.stopPropagation(); toggle(k); } }, isL ? "Unlearn" : "Learn"),
-            hoverable() ? h("span", { class: "tt-hint" }, "or click the node") : null);
+      const action = !ok ? h("div", { class: "tt-hint warn" }, "Сначала изучи: " + d.pre.filter((p) => !learned.has(p)).map((p) => view(p).n).join(", "))
+        : d.k === "c" && !isL ? h("div", { class: "tt-hint" }, "Выбери один вариант.")
+        : h("div", { class: "tt-actions" }, h("button", { type: "button", class: "tt-btn", onclick: (e) => { e.stopPropagation(); toggle(k); } }, isL ? "Забыть" : "Изучить"),
+            hoverable() ? h("span", { class: "tt-hint" }, "или кликни по узлу") : null);
       const opts = d.k === "c" ? d.opts.map((o, i) => h("div", { class: "tt-opt" + (chosen.get(k) === i ? " on" : "") },
         h("div", { class: "tt-opt-name" }, icon(o.ic, "sm"), o.n), tipBody(o),
-        ok ? h("button", { type: "button", class: "tt-btn", onclick: (e) => { e.stopPropagation(); chosen.set(k, i); learned.add(k); refresh(); showTip(nodeEls[k], k, true); } }, chosen.get(k) === i ? "Chosen" : "Choose") : null)) : null;
+        ok ? h("button", { type: "button", class: "tt-btn", onclick: (e) => { e.stopPropagation(); chosen.set(k, i); learned.add(k); refresh(); showTip(nodeEls[k], k, true); } }, chosen.get(k) === i ? "Выбрано" : "Выбрать") : null)) : null;
       return h("div", { class: "tt", role: "tooltip" },
-        h("div", { class: "tt-head" }, d.k === "c" && !chosen.has(k) ? "Choose one" : v.n),
-        h("div", { class: "tt-body" }, d.k === "c" && !chosen.has(k) ? opts : [tipBody(v), d.k === "c" ? h("details", { class: "tt-more" }, h("summary", null, "Other options"), opts) : null],
-          costLine(v.c ? v : d), action,
-          v.l && isOpen(v.l) ? h("div", { class: "tt-link" }, link(v.l, "Open in the codex →")) : null));
+        h("div", { class: "tt-head" }, d.k === "c" && !chosen.has(k) ? "Выбери один" : v.n),
+        h("div", { class: "tt-body" }, d.k === "c" && !chosen.has(k) ? opts : [tipBody(v), d.k === "c" ? h("details", { class: "tt-more" }, h("summary", null, "Другие варианты"), opts) : null],
+          costLine(v.c ? v : d), action));
     }
     function showTip(btn, k, pin) {
       tipHost.replaceChildren(tooltip(k));
@@ -564,7 +520,7 @@
       b.addEventListener("click", (e) => { e.stopPropagation(); if (hoverable()) toggle(k); else if (pinned === b) hideTip(); else showTip(b, k, true); });
       return b;
     });
-    const spentEl = h("b"), linkBtn = h("button", { type: "button", class: "st-btn primary" }, "Confirm Choices");
+    const spentEl = h("b"), linkBtn = h("button", { type: "button", class: "st-btn primary" }, "Скопировать ссылку");
     function refresh() {
       nodeEls.forEach((b, k) => {
         if (!b) return;
@@ -590,20 +546,21 @@
     const note = h("span", { class: "st-note", "aria-live": "polite" });
     linkBtn.addEventListener("click", async () => {
       const url = location.href;
-      try { await navigator.clipboard.writeText(url); note.textContent = "Build link copied."; } catch (e) { note.textContent = "Copy the address bar to share this build."; }
+      try { await navigator.clipboard.writeText(url); note.textContent = "Ссылка на билд скопирована."; } catch (e) { note.textContent = "Скопируй адрес из строки браузера."; }
     });
-    const win = h("section", { class: "st-window", "aria-label": "Skill tree" },
-      h("header", { class: "st-head" }, h("span", { class: "st-emblem", "aria-hidden": "true" }), h("span", { class: "st-title" }, "Skill Tree"), h("kbd", null, "K"),
+    const win = h("section", { class: "st-window", "aria-label": "Дерево навыков" },
+      h("header", { class: "st-head" }, h("span", { class: "st-emblem", "aria-hidden": "true" }), h("span", { class: "st-title" }, "Дерево навыков"), h("kbd", null, "K"),
         h("span", { class: "st-name" }, T.name)),
       tabs, subs, stage,
       h("footer", { class: "st-foot" },
-        h("span", { class: "st-points" }, h("span", { class: "pt-sq big" }), " " + ptName + " Points spent: ", spentEl),
+        h("span", { class: "st-points" }, h("span", { class: "pt-sq big" }), " Потрачено очков " + ptName + ": ", spentEl),
         note,
-        h("span", { class: "st-actions" }, h("button", { type: "button", class: "st-btn", onclick: () => { learned.clear(); chosen.clear(); refresh(); hideTip(); } }, "Respec"), linkBtn)),
+        h("span", { class: "st-actions" }, h("button", { type: "button", class: "st-btn", onclick: () => { learned.clear(); chosen.clear(); refresh(); hideTip(); } }, "Сбросить"), linkBtn)),
       h("div", { class: "st-level" }, levelPicker()));
-    setPage(T.name + " skill tree", h("p", { class: "crumbs" }, link("", "Codex"), " / ", link("skills", "Skill trees")), h("h1", null, "Skill trees"),
-      h("p", { class: "lede small" }, "Plan a build like in the game: click a node to learn it, Respec to start over, Confirm Choices to copy a link to your build. Node order and unlocks come from game data. Cleric, Bard and Summoner use screenshot-guided layouts; other trees use a source-data-based arrangement pending visual verification."),
-      win);
+    const ownBuild = T.group === "Archetype" ? link("builds/" + id, "Готовый билд для " + T.name + " →") : null;
+    setPage(T.name + " — дерево навыков", h("p", { class: "crumbs" }, link("", "Главная"), " / ", link("skills", "Деревья навыков")), h("h1", null, "Деревья навыков"),
+      h("p", { class: "lede small" }, "Собери билд как в игре: клик по узлу — изучить, «Сбросить» — начать заново, «Скопировать ссылку» — поделиться билдом с пати. Порядок узлов и условия открытия — из данных игры. У Cleric, Bard и Summoner расположение как на скриншотах из игры, у остальных пока по цепочкам открытия."),
+      ownBuild ? h("p", null, ownBuild) : null, win);
     refresh();
   }
 
@@ -653,7 +610,7 @@
     };
     labels.forEach(([key, label]) => { const b = h("button", { type: "button", "data-tab": key, "aria-selected": "false", onclick: () => choose(key) }, label); tabs.append(b); });
     setPage("Guild Championships",
-      h("p", { class: "crumbs" }, link("", "Codex"), " / ", link("improvements", "Possible Improvements")),
+      h("p", { class: "crumbs" }, link("", "Главная"), " / ", link("improvements", "Possible Improvements")),
       h("h1", null, "Guild Championships"),
       h("p", { class: "lede small" }, "A proposal for city-sponsored regional guild tournaments: meaningful PvP, Node economics, and long-term civic rewards."),
       h("p", { class: "meta" }, "Community design proposal · Not an existing confirmed game mechanic"),
@@ -664,58 +621,58 @@
   // ——— experience ———
   async function pageXp(tab) {
     const xp = await load("xp.json");
-    const tabs = [["adv", "Character"], ["mods", "Multipliers"], ["craft", "Artisan"], ["weapons", "Weapons"], ["guild", "Guild"]];
+    const tabs = [["adv", "Персонаж"], ["mods", "Множители"], ["craft", "Ремесло"], ["weapons", "Оружие"], ["guild", "Гильдия"]];
     tab = tabs.some((t) => t[0] === tab) ? tab : "adv";
-    const xpLine = (l, v) => [h("b", null, "Level " + l), ": " + fmt(v) + " total XP"];
+    const xpLine = (l, v) => [h("b", null, "Уровень " + l), ": всего " + fmt(v) + " опыта"];
     const rowsFor = (curve, cap) => curve.filter((p) => !cap || p[0] <= cap).map((p) => {
       const n = curve.find((q) => q[0] === p[0] + 1);
-      return { cells: [p[0], fmt(p[1]), cap && p[0] >= cap ? "cap" : n ? fmt(n[1] - p[1]) : "—"], cls: cap && p[0] === cap ? "cap" : null };
+      return { cells: [p[0], fmt(p[1]), cap && p[0] >= cap ? "кап" : n ? fmt(n[1] - p[1]) : "—"], cls: cap && p[0] === cap ? "cap" : null };
     });
     let body;
     const a = xp.adventuring;
-    if (tab === "adv") body = [h("p", { class: "lede small" }, "Total adventuring experience needed for each level. Level cap in this build: " + a.cap + "."),
-      lineChart(a.curve.filter((p) => p[0] <= a.cap), { label: "Character XP", describe: xpLine }),
-      dl([["Experience debt on death", a.usesDebt ? "Yes" : "No"], ["Skill points", (a.skillPoints[1] || 0) + " per level from level 2"]]),
-      table(["Level", "Total XP", "To next"], rowsFor(a.curve, a.cap), [0, 1, 2])];
-    else if (tab === "mods") body = [h("h2", null, "Party size"), barChart(a.party, { label: "Party XP multiplier", describe: (x, y) => [h("b", null, x + " in party"), ": ×" + fmt(y)] }),
-      h("h2", null, "Level difference to target"), barChart(a.decay, { label: "XP by level difference", describe: (x, y) => [h("b", null, (x > 0 ? "+" : "") + x), ": ×" + fmt(y)] }),
-      h("h2", null, "Level spread in party"), barChart(a.disparity, { label: "XP by party level spread", describe: (x, y) => [h("b", null, "spread " + x), ": ×" + fmt(y)] })];
-    else if (tab === "craft") body = [["crafting", "Crafting"], ["gathering", "Gathering"]].map(([k, n]) => [h("h2", null, n), lineChart(xp[k].curve, { label: n, describe: xpLine })]);
-    else if (tab === "weapons") body = [h("p", { class: "lede small" }, "All " + xp.weapons.length + " weapon types share one curve."), lineChart(xp.weapons[0].curve, { label: "Weapon XP", describe: xpLine }),
-      table(["Weapon", "Levels"], xp.weapons.map((w) => [w.name, w.curve.length]), [1])];
-    else body = [lineChart(xp.guild.curve.filter((p) => p[0] >= 1), { label: "Guild XP", describe: xpLine }), table(["Level", "Total XP", "To next"], rowsFor(xp.guild.curve.filter((p) => p[0] >= 1), xp.guild.cap), [0, 1, 2])];
-    setPage("Experience", h("h1", null, "Experience"), h("nav", { class: "tabs", "aria-label": "Experience types" }, tabs.map(([id, n]) => h("a", { href: "#/xp/" + id, "aria-current": id === tab ? "page" : null }, n))), body);
+    if (tab === "adv") body = [h("p", { class: "lede small" }, "Сколько всего опыта нужно на каждый уровень. Кап в этой версии: " + a.cap + ". Советы — в разделе ", link("leveling", "Прокачка"), "."),
+      lineChart(a.curve.filter((p) => p[0] <= a.cap), { label: "Опыт персонажа", describe: xpLine }),
+      dl([["Долг опыта при смерти", a.usesDebt ? "Да" : "Нет"], ["Очки навыков", (a.skillPoints[1] || 0) + " за уровень, начиная со 2-го"]]),
+      table(["Уровень", "Всего опыта", "До следующего"], rowsFor(a.curve, a.cap), [0, 1, 2])];
+    else if (tab === "mods") body = [h("h2", null, "Размер группы"), barChart(a.party, { label: "Множитель опыта группы", describe: (x, y) => [h("b", null, x + " в группе"), ": ×" + fmt(y)] }),
+      h("h2", null, "Разница уровней с целью"), barChart(a.decay, { label: "Опыт от разницы уровней", describe: (x, y) => [h("b", null, (x > 0 ? "+" : "") + x), ": ×" + fmt(y)] }),
+      h("h2", null, "Разброс уровней в группе"), barChart(a.disparity, { label: "Опыт от разброса уровней в группе", describe: (x, y) => [h("b", null, "разброс " + x), ": ×" + fmt(y)] })];
+    else if (tab === "craft") body = [["crafting", "Крафт и переработка"], ["gathering", "Сбор"]].map(([k, n]) => [h("h2", null, n), lineChart(xp[k].curve, { label: n, describe: xpLine })]);
+    else if (tab === "weapons") body = [h("p", { class: "lede small" }, "Все виды оружия растут по одной кривой."), lineChart(xp.weapons[0].curve, { label: "Опыт оружия", describe: xpLine }),
+      table(["Оружие", "Уровней"], xp.weapons.filter((w) => w.name !== "Weapon").map((w) => [w.name, w.curve.length]), [1])];
+    else body = [lineChart(xp.guild.curve.filter((p) => p[0] >= 1), { label: "Опыт гильдии", describe: xpLine }), table(["Уровень", "Всего опыта", "До следующего"], rowsFor(xp.guild.curve.filter((p) => p[0] >= 1), xp.guild.cap), [0, 1, 2])];
+    setPage("Опыт", h("p", { class: "crumbs" }, link("", "Главная")), h("h1", null, "Опыт"), h("nav", { class: "tabs", "aria-label": "Виды опыта" }, tabs.map(([id, n]) => h("a", { href: "#/xp/" + id, "aria-current": id === tab ? "page" : null }, n))), body);
   }
 
-  function pageSoon() {
-    setPage("Coming soon", h("p", { class: "crumbs" }, link("", "Codex")), h("h1", null, "Coming soon"),
-      h("p", { class: "lede small" }, "This part of the codex is still being checked against the game. It will open soon."),
-      h("p", null, "Open now: ", link("classes", "Classes"), ", ", link("skills", "Skill trees"), " and ", link("xp", "Experience"), "."));
+  function pageGone() {
+    setPage("Раздела больше нет", h("p", { class: "crumbs" }, link("", "Главная")), h("h1", null, "Раздела больше нет"),
+      h("p", { class: "lede small" }, "Сырую базу (предметы, лут, квесты) мы убрали: есть проекты, где это сделано лучше. Их список — в ", link("links", "Ссылках"), "."),
+      h("p", null, "Есть на сайте: ", link("start", "Где качать"), ", ", link("leveling", "Прокачка"), ", ", link("builds", "Билды"), ", ", link("classes", "Классы"), ", ", link("skills", "Деревья навыков"), ", ", link("xp", "Опыт"), "."));
   }
-  function pageMissing() { setPage("Not found", h("h1", null, "Page not found"), h("p", null, "Check the address or go back to the ", link("", "codex"), ".")); }
+  function pageMissing() { setPage("Не найдено", h("h1", null, "Страница не найдена"), h("p", null, "Проверь адрес или вернись на ", link("", "главную"), ".")); }
 
   async function route() {
     const raw = location.hash.replace(/^#\/?/, "");
-    const [path, query] = raw.split("?");
+    const [path] = raw.split("?");
     const parts = path.split("/").filter(Boolean).map(decodeURIComponent);
-    const q = new URLSearchParams(query || "").get("q") || "";
     markNav(parts.join("/"));
     try {
       if (!parts.length) await pageHome();
-      else if (parts[0] === "search" || parts[0] === "db") pageSoon();
+      else if (parts[0] === "start" || parts[0] === "leveling") await pageDoc(parts[0]);
+      else if (parts[0] === "builds") await pageBuilds(parts[1]);
+      else if (parts[0] === "links") await pageLinks();
+      else if (parts[0] === "search" || parts[0] === "db") pageGone();
       else if (parts[0] === "improvements") pageImprovements(parts[1]);
       else if (parts[0] === "xp") await pageXp(parts[1]);
       else if (parts[0] === "classes") await pageClasses(parts[1]);
       else if (parts[0] === "skills") await pageSkills(parts[1]);
-      else if (parts[0] === "db" && parts.length === 2) await pageList(parts[1], q);
-      else if (parts[0] === "db" && parts.length === 3) await pageRecord(parts[1], parts[2]);
       else pageMissing();
     } catch (e) {
-      setPage("Error", h("h1", null, "This page could not be opened"), h("p", { class: "warn" }, e.message),
-        h("p", { class: "muted" }, location.protocol === "file:" ? "Open the site through a web server, for example: python3 -m http.server" : "Check that the data/ folder is built and published."));
+      setPage("Ошибка", h("h1", null, "Страница не открылась"), h("p", { class: "warn" }, e.message),
+        h("p", { class: "muted" }, location.protocol === "file:" ? "Открой сайт через веб-сервер, например: python3 -m http.server" : "Проверь, что папки data/ и content/ на месте."));
     }
   }
 
   load("index.json").then((idx) => { INDEX = idx; buildNav(); window.addEventListener("hashchange", route); route(); })
-    .catch((e) => main.replaceChildren(h("div", { class: "page" }, h("h1", null, "No data"), h("p", { class: "warn" }, e.message))));
+    .catch((e) => main.replaceChildren(h("div", { class: "page" }, h("h1", null, "Нет данных"), h("p", { class: "warn" }, e.message))));
 })();

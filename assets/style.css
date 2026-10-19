@@ -12,7 +12,7 @@
   --ember: #c4583a;        /* warnings */
   --sky: #8fb4c9;          /* chances and numbers */
 
-  --display: "Cinzel", "Trajan Pro", Georgia, serif;
+  --display: "Cinzel", "Cormorant SC", "Trajan Pro", Georgia, serif; /* Cinzel has no Cyrillic: Russian falls back to Cormorant SC */
   --serif: "Spectral", Georgia, serif;
   --sans: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
   --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
@@ -321,3 +321,39 @@ ul.abil p + p { margin-top: 6px; }
 .idea-panel h2 { margin: 0 0 9px; font-size: 1.15rem; color: var(--gold); }
 .idea-panel p { margin: 0; line-height: 1.7; }
 @media (max-width: 600px) { .idea-card { padding: 18px; } .idea-more { width: 100%; } .idea-tabs button { flex: 1 1 auto; padding: 10px 8px; } .idea-panel { padding: 15px; } }
+
+/* ——— party guide pages (content/*.json) ——— */
+.home-h { margin: 30px 0 12px; font-size: 1.1rem; color: var(--gold); letter-spacing: 0.06em; }
+.doc-block { margin: 26px 0 0; max-width: 46em; }
+.doc-block h2 { font-size: 1.25rem; color: var(--gold); margin-bottom: 10px; }
+.doc-block p { margin: 8px 0; line-height: 1.6; }
+.doc-list, .doc-steps { margin: 8px 0; padding-left: 1.3em; line-height: 1.55; }
+.doc-list li, .doc-steps li { margin: 6px 0; padding-left: 2px; }
+.doc-steps { counter-reset: none; }
+.doc-steps li::marker { color: var(--gold); font-weight: 700; }
+.doc-note { margin: 14px 0; padding: 10px 14px; border: 1px solid var(--gold-dim); border-left-width: 3px; border-radius: 4px; background: rgba(208,168,87,.08); max-width: 46em; }
+.doc-block code, .doc-note code, .plan code { font: 0.86em var(--mono); background: var(--slab-2); border: 1px solid var(--rule); border-radius: 3px; padding: 0 4px; overflow-wrap: anywhere; }
+.doc-block .table-wrap td { vertical-align: top; line-height: 1.45; }
+.doc-sources { margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--rule); font-size: 0.9rem; }
+.doc-sources h2 { font-size: 1rem; color: var(--dust); }
+.doc-sources ul { padding-left: 1.2em; margin: 8px 0; }
+.doc-sources li { margin: 4px 0; overflow-wrap: anywhere; }
+.linkcards { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.linkcard { padding: 12px 14px; background: var(--slab); border: 1px solid var(--rule); border-radius: 6px; min-width: 0; }
+.linkcard p { margin: 6px 0 0; color: var(--parchment); font-size: 0.92rem; line-height: 1.45; }
+.lc-head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.lc-name { font-weight: 700; }
+.lc-host { display: block; color: var(--dust); font: 0.75rem var(--mono); overflow-wrap: anywhere; margin-top: 2px; }
+.tag.off { color: var(--ember); border-color: var(--ember); }
+.plan { margin: 12px 0; padding: 12px 14px; background: var(--slab); border: 1px solid var(--rule); border-radius: 6px; }
+.plan-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.plan-head h3 { font-size: 1rem; margin: 0; color: var(--parchment); }
+.plan-head .st-btn { margin-left: auto; text-decoration: none; display: inline-block; }
+.plan-pts { color: var(--sky); font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+.plan-pts.over { color: var(--ember); }
+.plan .chips li { padding: 3px 9px; background: var(--slab-2); border: 1px solid var(--rule); border-radius: 4px; font-size: 0.85rem; }
+.plan .chips li.miss { border-style: dashed; color: var(--dust); }
+.rot { display: grid; gap: 8px; max-width: 46em; }
+.rot-row { padding: 10px 14px; background: var(--slab); border-left: 3px solid var(--gold-dim); border-radius: 4px; }
+.rot-row p { margin: 4px 0 0; line-height: 1.5; }
+@media (max-width: 600px) { .plan-head .st-btn { margin-left: 0; width: 100%; text-align: center; } }

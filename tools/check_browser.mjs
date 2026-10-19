@@ -23,15 +23,25 @@ const base = "http://127.0.0.1:" + server.address().port + "/";
 const browser = await chromium.launch({headless:true});
 let failures = [];
 async function check(page,route,selector) {
+  await page.goto("about:blank");
   await page.goto(base + "#/" + route, {waitUntil:"domcontentloaded"});
   await page.locator(selector).first().waitFor({timeout:15000});
   const error = await page.locator("h1").first().textContent();
-  assert.notEqual(error,"This page could not be opened",route+" failed to load");
+  assert.notEqual(error,"Страница не открылась",route+" failed to load");
 }
 try {
   const page = await browser.newPage({viewport:{width:1440,height:900}});
   page.on("pageerror", e => failures.push("JS: "+e.message));
   await check(page,"","h1");
+  for (const [route, sel] of [["start", ".doc-steps"], ["leveling", ".table-wrap"], ["builds", ".cards a"], ["links", ".linkcard"], ["xp", ".chart"], ["classes/cleric", ".abil"]]) await check(page, route, sel);
+  const builds = JSON.parse(await fs.readFile(path.join(root, "content/builds.json"), "utf8")).classes;
+  for (const c of builds) {
+    await check(page, "builds/" + c.id, ".plan");
+    const want = await page.locator(".plan-pts").first().textContent();
+    await page.locator(".plan .st-btn").first().click();
+    await page.locator(".st-node").first().waitFor({timeout:15000});
+    assert.equal(await page.locator(".st-points b").textContent(), want.split(" ")[0], c.id + ": planner link points differ from the build page");
+  }
   await check(page,"improvements",".idea-more");
   await page.locator(".idea-more").click();
   await page.locator(".idea-tabs button").last().click();
@@ -48,7 +58,7 @@ try {
   }
   await check(page,"skills/cleric",".st-node");
   await page.locator(".st-node").first().click();
-  await page.locator(".st-btn").filter({hasText:"Respec"}).click();
+  await page.locator(".st-btn").filter({hasText:"Сбросить"}).click();
   assert.equal(await page.locator(".st-node.learned").count(),0,"Respec failed");
   const mobile = await browser.newPage({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
   mobile.on("pageerror", e => failures.push("Mobile JS: "+e.message));
@@ -59,5 +69,5 @@ try {
   await check(mobile,"skills/summoner",".st-node");
   assert.equal(await mobile.locator(".st-node").count(),54,"Mobile summoner nodes missing");
   assert.deepEqual(failures,[],"Browser JavaScript errors");
-  console.log("PASS: home, improvement proposal and tabs, all 23 skill tree routes/node counts, respec, and mobile routes.");
+  console.log("PASS: home, party pages and build links, improvement proposal and tabs, all 23 skill tree routes/node counts, respec, and mobile routes.");
 } finally { await browser.close(); await new Promise(resolve => server.close(resolve)); }

@@ -1,0 +1,244 @@
+{
+  "title": "Прокачка",
+  "lede": "Как быстрее дойти до 25 уровня, где качаться и как растут оружие и ремесло. Цифры опыта взяты из данных игры, маршрут — из гайдов Early Access (январь 2026).",
+  "updated": "2026-10-19",
+  "blocks": [
+    {
+      "h": "Главное про опыт",
+      "list": [
+        "Кап персонажа — **25 уровень**. Со 2-го уровня даётся по 1 очку навыка за уровень, итого 24 очка к капу.",
+        "Смерть даёт **долг опыта**: часть следующего опыта уходит на его погашение. Не умирай зря.",
+        "Таблица опыта по уровням и графики — в разделе [Опыт](#/xp)."
+      ]
+    },
+    {
+      "h": "Группа и разница уровней",
+      "p": [
+        "Множители из данных игры. Evolve может менять их на своём сервере."
+      ],
+      "table": {
+        "head": [
+          "Что",
+          "Множитель опыта"
+        ],
+        "rows": [
+          [
+            "Группа 2 / 3 / 4 / 5 / 6 / 7 / 8 человек",
+            "×1,4 / ×1,6 / ×1,75 / ×1,9 / ×2,0 / ×2,1 / ×2,2"
+          ],
+          [
+            "Группа 9 / 10 / 11 / 12 человек",
+            "×1,6 / ×1,4 / ×1,2 / ×1,0"
+          ],
+          [
+            "Моб ниже тебя на 1…9 уровней",
+            "−10% за каждый уровень разницы"
+          ],
+          [
+            "Моб ниже на 10 уровней",
+            "0, опыта нет"
+          ],
+          [
+            "Моб выше на 1 уровень",
+            "×1,05"
+          ],
+          [
+            "Моб выше на 2…9 уровней",
+            "×1,1"
+          ],
+          [
+            "Моб выше на 10 уровней",
+            "0, опыта нет"
+          ],
+          [
+            "Разброс уровней в группе до 5",
+            "без штрафа"
+          ],
+          [
+            "Разброс 6 / 7 / 8 / 9 / 10",
+            "×0,8 / ×0,6 / ×0,4 / ×0,2 / 0"
+          ]
+        ]
+      },
+      "after": [
+        "Вывод для пати: держитесь в пределах 5 уровней друг от друга и бейте мобов своего уровня или на 2–3 выше. Лучше всего — полная группа до 8 человек. Как именно общий опыт делится между игроками, в данных не видно."
+      ]
+    },
+    {
+      "h": "Маршрут 1–25",
+      "p": [
+        "Собрано из гайдов MetaBattle и GGWTB для Early Access. Названия мест сверены с данными игры."
+      ],
+      "table": {
+        "head": [
+          "Уровни",
+          "Соло",
+          "Группа"
+        ],
+        "rows": [
+          [
+            "1–5",
+            "Сюжетные квесты в Lionhold и Samia's Hope. Гоблины у старта, бандиты к западу от Samia's Hope. По сюжету дадут коня.",
+            "Те же места или северо-восток от Samia's Hope: мобов гуще."
+          ],
+          [
+            "5–10",
+            "Church of the Seven Stars, призраки по одному, элиток обходить. Запасной вариант — звери у Baneswood Cemetery или Gemspring.",
+            "Church of the Seven Stars, элитки пачками. Группой 2–3 — Shardlings к востоку от Miraleth."
+          ],
+          [
+            "9–12",
+            "Медведи у Lionhold: рядом город, ремонт и банк.",
+            "—"
+          ],
+          [
+            "10–15",
+            "Элитные скелеты у Miraleth или Overcharged Shardlings к востоку от Miraleth (Crystal Golem не трогать).",
+            "Highwaymen Hills с 10-го. Daragal Estates (11–13), Oakenbane Keep с 12-го."
+          ],
+          [
+            "15–20",
+            "Крабы на западном пляже у Seahook.",
+            "Крабы у Seahook пачками, это стабильный фарм для группы."
+          ],
+          [
+            "20–25",
+            "Overcharged Shardlings глубже в пустыне, к востоку от Sunhaven. Мобы там часто меняют место.",
+            "Tower of Carphin или Wreckage of Carphin с 20-го. Районы у Wildport."
+          ]
+        ]
+      },
+      "after": [
+        "Меняй место, если четверть времени уходит на ожидание мобов, потерю тегов или отдых."
+      ]
+    },
+    {
+      "h": "Свитки и еда",
+      "list": [
+        "**Scroll of Adventuring Experience:** Novice с 1-го уровня, Apprentice с 10-го, Journeyman с 20-го.",
+        "**Эликсир основного стата** с 20-го уровня: Strength для бойцов и лучников, Intelligence для магов и хилов, Constitution для танка.",
+        "**Еда весь путь:** Fresh Salad или Fruit Salad, позже Chicken Salad или Roasted Grem."
+      ]
+    },
+    {
+      "h": "Советы",
+      "list": [
+        "Сначала стартовые квесты ноды и цепочки Destiny — они дают основной опыт в начале.",
+        "Собирай мобов автоатаками и бей пачку AoE, если класс умеет.",
+        "Материалы складывай в хранилище ноды: при смерти часть вещей падает.",
+        "Около 5-го уровня появляется оружие Wanderer, его хватает примерно на 10 уровней. Другой вариант с 5-го уровня — оружие Sanctus за 3 монеты из квеста Surplus Coins."
+      ]
+    },
+    {
+      "h": "Оружие",
+      "list": [
+        "У каждого вида оружия свой уровень, до **25** (в данных 20 видов оружия и рукопашный бой Unarmed). Все растут по одной кривой.",
+        "Уровень оружия растёт, пока ты им бьёшь. Носи и ближнее, и дальнее, переключайся по ситуации — так качаются оба.",
+        "У дерева оружия свои очки, отдельно от очков архетипа (вкладка Weapon в [деревьях навыков](#/skills))."
+      ]
+    },
+    {
+      "h": "Ремесло (Artisan)",
+      "p": [
+        "22 профессии в трёх ветках. У каждой своя полоса опыта: 50 уровней по кривой Crafting или Gathering."
+      ],
+      "table": {
+        "head": [
+          "Ветка",
+          "Профессии"
+        ],
+        "rows": [
+          [
+            "Сбор",
+            "Fishing, Herbalism, Hunting, Lumberjacking, Mining"
+          ],
+          [
+            "Переработка",
+            "Alchemy, Animal Husbandry, Cooking, Farming, Lumber Milling, Metalworking, Stonemasonry, Tanning, Weaving"
+          ],
+          [
+            "Крафт",
+            "Arcane Engineering, Armor Smithing, Carpentry, Jeweler, Leatherworking, Scribe, Tailoring, Weapon Smithing"
+          ]
+        ]
+      },
+      "after": [
+        "Опыт профессии идёт за саму работу: сбор, переработку, крафт. Очки тратятся в дереве профессии.",
+        "Чтобы расти дальше, сертификат профессии повышают у NPC в поселении, иначе прогресс упирается в потолок. Чем выше ранг, тем меньше сертификатов можно держать (у Apprentice 5, у Grandmaster 2). Лишний сертификат можно понизить.",
+        "Инструменты изнашиваются: чини или меняй вовремя."
+      ]
+    },
+    {
+      "h": "Что из чего делается",
+      "p": [
+        "По рецептам из данных клиента: какие профессии поставляют материалы для крафта. Видно, что почти всё держится на Lumber Milling, Metalworking и Stonemasonry."
+      ],
+      "table": {
+        "head": [
+          "Крафт",
+          "Нужны материалы от"
+        ],
+        "rows": [
+          [
+            "Weapon Smithing",
+            "Metalworking, Lumber Milling, Stonemasonry"
+          ],
+          [
+            "Armor Smithing",
+            "Metalworking, Stonemasonry, Tanning"
+          ],
+          [
+            "Leatherworking",
+            "Tanning, Weaving, Stonemasonry"
+          ],
+          [
+            "Tailoring",
+            "Weaving, Tanning, Stonemasonry"
+          ],
+          [
+            "Jeweler",
+            "Stonemasonry, Metalworking, Cooking"
+          ],
+          [
+            "Carpentry",
+            "Lumber Milling, Weaving, Metalworking, Cooking"
+          ],
+          [
+            "Arcane Engineering",
+            "Lumber Milling, Alchemy, Metalworking, Stonemasonry"
+          ],
+          [
+            "Scribe",
+            "Alchemy, Lumber Milling"
+          ]
+        ]
+      },
+      "after": [
+        "Переработка в свою очередь берёт сырьё из сбора: Mining → Metalworking и Stonemasonry, Lumberjacking → Lumber Milling, Hunting → Tanning, Herbalism → Alchemy и Weaving, Fishing и Hunting → Cooking."
+      ],
+      "note": "Как поделить на пати: один качает Mining + Metalworking + Stonemasonry, второй Lumberjacking + Lumber Milling, третий Hunting и Herbalism + Tanning и Weaving. Тогда любой крафт снаряжения собирается внутри пати. Кто крафтит что — решим, когда станет ясно, кто чем играет."
+    }
+  ],
+  "sources": [
+    [
+      "MetaBattle: Ashes of Creation Leveling Guide",
+      "https://metabattle.com/aoc/Ashes_of_Creation_Leveling_Guide"
+    ],
+    [
+      "GGWTB: Leveling Guide 1–25 (31.12.2025)",
+      "https://ggwtb.com/blog/ashes-of-creation-leveling-guide-1-25-fast-core-route---best-alternate-spots"
+    ],
+    [
+      "GamerBlurb: How to Level",
+      "https://gamerblurb.com/articles/ashes-of-creation-how-to-level"
+    ],
+    [
+      "Windows Report: Artisan Classes and Professions (16.12.2025)",
+      "https://windowsreport.com/ashes-of-creation-early-access-artisan-classes-and-professions-explained/"
+    ],
+    [
+      "Сборки классов MetaBattle (патч 28.01.2026): свитки и еда",
+      "https://metabattle.com/aoc/Ashes_of_Creation_Builds"
+    ]
+  ]
+}

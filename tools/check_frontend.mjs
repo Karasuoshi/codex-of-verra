@@ -36,4 +36,23 @@ for (const id of ["cleric", "bard", "summoner"]) {
     assert.ok(d >= 36, id + ": overlapping nodes " + i + ", " + j);
   }
 }
-console.log("PASS: JS parses; proposal routes/styles exist; 23 skill trees complete; three screenshot layouts cover every node without overlap.");
+// Hand-written party pages: valid JSON, required fields, and every build skill exists in its tree.
+for (const name of ["start", "leveling", "builds", "links"]) {
+  const d = JSON.parse(read("content/" + name + ".json"));
+  assert.ok(d.title && d.lede, name + ": title and lede are required");
+  for (const b of d.blocks || []) assert.ok(b.h || b.p || b.list || b.steps || b.table, name + ": empty block");
+}
+const findNode = (nodes, nm) => nodes.some((d) => d.k === "c" ? d.opts.some((o) => o.n === nm) : d.n === nm);
+const builds = JSON.parse(read("content/builds.json"));
+assert.equal(builds.classes.length, 8, "Expected builds for all 8 classes");
+const stamina = JSON.parse(read("data/trees/stamina.json")).nodes;
+for (const c of builds.classes) {
+  const nodes = JSON.parse(read("data/trees/" + c.id + ".json")).nodes;
+  for (const b of c.builds) for (const nm of b.skills) assert.ok(findNode(nodes, nm), c.id + ": skill not in tree: " + nm);
+  if (c.stamina) assert.ok(builds.stamina_presets[c.stamina], c.id + ": unknown stamina preset " + c.stamina);
+}
+for (const [k, p] of Object.entries(builds.stamina_presets)) for (const nm of p.skills) assert.ok(findNode(stamina, nm), "stamina " + k + ": not in tree: " + nm);
+const links = JSON.parse(read("content/links.json"));
+for (const g of links.groups) for (const it of g.items) assert.match(it.url, /^https:\/\//, it.name + ": link must be https");
+for (const route of ['"start"', '"leveling"', '"builds"', '"links"']) assert.ok(app.includes("parts[0] === " + route), "Missing route " + route);
+console.log("PASS: JS parses; party pages valid; all build skills found in their trees; proposal routes/styles exist; 23 skill trees complete; three screenshot layouts cover every node without overlap.");

@@ -13,34 +13,41 @@ in the code it points to. Nothing is kept in anyone's head.
 
 ## 1. What the project is
 
-Ashes of Creation (AoC) was an MMORPG whose Early Access client stopped being served in
-February 2026. The last client build (2026-01-20) still ships its full game-design data in one
-file on disk. **Codex of Verra** is an English fan database built from that file:
-- classes, abilities and skill trees;
-- items, recipes, loot tables;
-- creatures, quests and places;
-- formulas and experience curves.
+**Since 2026-10-19 this is Artyom's personal site for himself and his small party**: practical
+notes for playing Ashes of Creation (AoC) now, in Russian. It is not trying to be a full game
+database: other community projects do that better, and the site links to them.
 
-It is part of a wider community effort to keep the game playable on private servers. The site
-is the public, readable face of that data. The tools in `tools/` are also meant to be reused by
-server developers.
+Ashes of Creation was an MMORPG whose official servers shut down in February 2026. The party
+plays on the fan-run **Evolve Community Server** (aocevolve.com) with their own Steam clients.
 
-The project is built on what can be found in the game files and in screenshots from players.
-Statements made by the original developers are not used as a source of truth.
+What the site has:
+- **Где качать** (`#/start`): getting the client from Steam, Evolve account, Companion launcher.
+- **Прокачка** (`#/leveling`): XP rules from the game data, a 1–25 route, scrolls and food,
+  weapon levels, professions and what feeds what.
+- **Билды** (`#/builds`): a starting build per class with rotations, stamina priorities, tips and
+  a button that opens the build in the skill tree planner.
+- **Ссылки** (`#/links`): other AoC projects with one-line descriptions.
+- **Reference from the game files:** Классы (abilities with mana, cooldowns, range), Деревья
+  навыков (the in-game style planner) and Опыт (XP curves).
+
+The last client build (2026-01-20) ships its full game-design data in one file on disk; the
+reference pages are built from it with the tools in `tools/`. Statements made by the original
+developers are not used as a source of truth.
 
 ## 2. Ground rules (read first)
 
 1. **`main` is the live site.** GitHub Pages serves the `main` branch as is.
    - Never push straight to `main`. Work on a branch and open a pull request.
    - Artyom merges when he says it should go live.
-2. **Public text is in English.** This covers the site, README, commit messages and code
-   comments. Artyom himself works in Russian. If you talk to him, Russian is welcome, short and
-   to the point.
-3. **Only three sections are open on the site:** Classes, Skill trees and Experience.
-   - Everything else shows as "Coming soon" and cannot be clicked.
-   - This is controlled in `assets/app.js` by the `OPEN` regex and `link()` (what is clickable), and by
-     `route()`, which sends `db/*` and `search` to the "Coming soon" page.
-   - Open a new section only after Artyom agrees that its data is checked.
+2. **Languages.** The site text is **Russian** (it is for the party). Skill, item and place
+   names stay **in English, exactly as in the game**, so they match what players see.
+   README, AGENTS.md, code comments and commit messages stay in English. Talk to Artyom in
+   Russian, short and to the point.
+3. **What is on the site.** Menu: Где качать, Прокачка, Билды / Классы, Деревья навыков, Опыт /
+   Ссылки. The old raw database (items, loot, quests…) was removed from the site on 2026-10-19;
+   its data stays in `data/` and old `#/db/...` links show a short "section removed" page.
+   `#/improvements` (a community proposal page) is reachable by direct link only, not in the menu.
+   Adding a section to the menu needs Artyom's OK.
 4. **No secrets in the repository.** Never commit or ask for passwords, tokens or keys.
 5. **No game files in the repository.** The `.dbc`, `.utoc`, `.ucas` and `.pak` files, and the
    zips extracted from them, stay out. They are also far over GitHub's 100 MB file limit.
@@ -69,6 +76,11 @@ index.html            page shell (fonts, nav, <main>)
 assets/app.js         the whole front end, no framework, no build step
 assets/style.css      the look (dark stone and gold, game-style skill tree)
 og.jpg                link preview image 1200x630
+content/              HAND-WRITTEN Russian pages (edit these to change texts):
+  start.json          Где качать и как зайти
+  leveling.json       Прокачка
+  builds.json         Билды: per class, skill lists resolved to planner links
+  links.json          Полезные ссылки
 data/                 GENERATED site data (do not hand-edit; rebuild)
   index.json          sections, record counts, shard counts, build date
   <section>.json      list rows of a section (id, name, short fields, icon)
@@ -100,10 +112,27 @@ python3 -m http.server 8000
 
 A web server is required: the site loads JSON with `fetch`, which does not work from `file://`.
 Routes are hash routes:
+- `#/start`, `#/leveling`, `#/links`: hand-written pages from `content/`.
+- `#/builds/<class>`: a class build page.
 - `#/classes/<id>`: a class page.
 - `#/skills/<id>?b=3.5.7c1`: a skill tree with a saved build (node indexes; `cN` = chosen option).
 - `#/xp/<tab>`: experience curves.
-- `#/db/<section>/<id>`: a record page (locked for now).
+- `#/db/...`, `#/search`: removed; they show a "section removed" page.
+
+### Editing the hand-written pages (`content/*.json`)
+
+- A page has `title`, `lede`, `updated` (YYYY-MM-DD), `blocks` and `sources` (`[title, url]`).
+- A block can have `h` (heading), `p` (paragraphs), `list`, `steps` (numbered), `table`
+  (`head`, `rows`), `after` (paragraphs after the table) and `note` (a highlighted box).
+- Inline markup in any string: `**bold**`, `` `code` ``, `[text](url)`. Use `#/route` for links
+  inside the site; external links open in a new tab. Nothing else is interpreted (no HTML).
+- `builds.json`: each class has `builds[].skills`. These must be node names exactly as in
+  `data/trees/<class>.json` (for a choice node, the option's name). The page adds
+  prerequisites, counts points and builds the `?b=` planner link. `stamina_presets` work the
+  same way against `data/trees/stamina.json`.
+- `links.json`: groups of `{name, url, what, status}`; `status: "закрыт"` shows a red tag.
+- Every fact needs a source in `sources` (or `source` per class). Mark guesses as guesses.
+- `node tools/check_frontend.mjs` validates all four files and checks every build skill name.
 
 ## 5. Rebuild the data from the game file
 
@@ -331,28 +360,40 @@ All game logic lives in this file, outside the asset paks.
 ## 8. Front end notes (`assets/app.js`)
 
 - **Structure:** plain JS in one IIFE, with no dependencies and no build step.
-  - `h()` creates elements and `load()` fetches JSON from `data/` with a cache.
+  - `h()` creates elements and `load()` fetches JSON from `data/` (or `content/` when the path
+    starts with `content/`) with a cache. `rich()` renders the inline markup of content strings.
   - `route()` dispatches on the hash.
 - **Pages:**
   - `pageHome`;
+  - `pageDoc(name)` (`start`, `leveling`), `pageBuilds(id)` (with `buildCode()` that turns skill
+    names into a planner link), `pageLinks`;
   - `pageClasses(id)`;
   - `pageSkills(id)` (the tree planner, with layout constants `STEP`, `ROWH`, `PADX`, `PADY`,
     `TIERGAP`);
   - `pageXp`;
-  - `pageList`, `pageRecord` and `pageSearch` (`#/search?q=`): all locked, routed to `pageSoon`;
-  - `pageMissing` (unknown routes).
+  - `pageImprovements` (direct link only), `pageGone` (old `db/*` and `search` links),
+    `pageMissing` (unknown routes).
 - **Skill planner:**
   - Learned nodes live in the URL (`?b=`), so builds can be shared.
   - Learning a node needs its prerequisites; unlearning cascades.
   - Desktop shows tooltips on hover; on a phone, a tap docks the tooltip at the bottom.
-- **localStorage keys:** `cov.level` (level picker, default 50) and `cov.dev` (show legacy
-  records). Every access is wrapped in try/catch.
+- **localStorage key:** `cov.level` (level picker, default 50), wrapped in try/catch.
 - **Style:**
-  - fonts Cinzel, Spectral and Alegreya Sans (Google Fonts); dark theme only;
+  - fonts Cinzel (Latin headings), Cormorant SC (Cyrillic headings: Cinzel has no Cyrillic),
+    Spectral and Alegreya Sans (Google Fonts); dark theme only;
   - all images are local (`icons/`, `art/`), with no third-party image hosts;
   - all links are relative, because the site lives under `/codex-of-verra/`.
 
 ## 9. Open work (good first tasks), in rough priority
+
+**For the party pages (most useful now):**
+- Check the builds in play on Evolve and correct `content/builds.json` (what works, what not).
+- Add our own characters and the profession split once the party has decided.
+- Fill the route for levels 15–20 with places we actually used; replace guide spots with ours.
+- Add weapon tree picks per build (the guides do not give them).
+- Keep `content/links.json` current: new tools, dead links.
+
+**Data work (reference pages):**
 
 1. **Effect durations and percentages** (table 4): `$statmodN$`, `...fordur`, linger zones.
    - Saga and Chains of Restraint are examples: tick, duration and damage per tick.
@@ -369,10 +410,9 @@ All game logic lives in this file, outside the asset paks.
 7. **World positions of NPCs and spawns.** They are not in the `.dbc` (spawn rows have no
    coordinates). They live in the level / world-partition data in the paks. Players already ask
    "where does NPC X stand".
-8. **Re-open the locked sections** one by one once their data is checked (items first).
-9. **XP curves from the `.dbc`:** `build/xp.json` still comes from an older community sample.
+8. **XP curves from the `.dbc`:** `build/xp.json` still comes from an older community sample.
    Regenerate it from the curve table 296 (`Adventuring_LevelUpCurve` and others).
-10. **Combat-meter names:** a JSON map from internal ability or effect names to display names and
+9. **Combat-meter names:** a JSON map from internal ability or effect names to display names and
    icons. Players' combat-log tools can use it.
 
 Before you start on one, open a GitHub issue or tell Artyom, so two people do not do the same

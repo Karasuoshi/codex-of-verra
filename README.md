@@ -1,35 +1,30 @@
 # Codex of Verra
 
-A fan-made database for **Ashes of Creation**: items, creatures, recipes, loot tables, quests, places, abilities, status effects, lore and game formulas. Everything is read from the design-data cache that shipped with the last Early Access client (build of 2026-01-20).
+Artyom's personal site for his small party in **Ashes of Creation**, in Russian: where to get the game and how to join the Evolve fan server, how to level, starting builds for every class, and links to other community projects. A reference part (classes, skill tree planner, XP curves) is built from the design data of the last Early Access client (build of 2026-01-20).
 
 Static site with no build step. It runs on GitHub Pages as is.
 
-**Want to help?** Read [`AGENTS.md`](AGENTS.md) first. It is the full project guide, for people and for AI assistants (Claude, ChatGPT / Codex, Cursor, Copilot…): rules, data format, how to rebuild, open tasks.
+**Want to help?** Read [`AGENTS.md`](AGENTS.md) first. It is the full project guide, for people and for AI assistants (Claude, ChatGPT / Codex, Cursor, Copilot…): rules, how to edit pages, data format, open tasks.
 
 **Address:** https://karasuoshi.github.io/codex-of-verra/
 
 ## What is inside
-- **Items:** every known source. The rule path is shown from the source to the item: loot table → subtable → … with weights, chances and conditions.
-- **Classes:** abilities of the eight archetypes, with older Alpha versions, plus weapon, general, artisan, consumable, siege and creature abilities.
-- **Loot tables:** all 8,197, decoded with rolls, weights, chance formulas and subtables.
-- **Recipes:** what each recipe produces. Ingredients are not decoded yet.
-- **Creatures:** loot where the client data links it.
-- **Quests:** texts and item rewards.
-- **Places:** zone-wide and point-of-interest drops.
-- **Formulas:** the game's named formulas as source text.
-- **Experience:** XP curves for character, artisan skills, weapons and guilds.
+- **Где качать** (`#/start`): Steam client, Evolve account, Evolve Companion on Windows and Linux.
+- **Прокачка** (`#/leveling`): XP rules from the game data, a 1–25 route, scrolls and food, weapon levels, professions and their supply chains.
+- **Билды** (`#/builds`): a starting build for each of the 8 classes with rotations, stamina priorities and a link that opens it in the planner.
+- **Ссылки** (`#/links`): other AoC projects with short descriptions.
+- **Классы, Деревья навыков, Опыт:** abilities with mana, cooldowns and range; the in-game style skill tree planner with shareable builds; XP curves.
+
+Page texts live in `content/*.json` (hand-written). Everything in `data/` is generated from the game file.
+
+The raw database (items, loot tables, recipes, quests, places, formulas) was removed from the site on 2026-10-19; its data is still in `data/` and the tools in `tools/`.
 
 **Icons:** 3,621 item, ability, status effect and building icons in `icons/` (WebP, up to 128 px), taken from the game's own unencrypted `pakchunk0` container.
 
-Legacy and test records (`zLegacy_`, `Test`, `GM_`, `NOTUSED`…) are hidden by default and can be shown in any list.
-
-## Known gaps
-- Most creature-specific loot tables are not linked to creatures in the client data, so creature drops are incomplete.
-- Recipe ingredients, item stats and enchantments are the next decoding steps.
-
 ## Files
 - `index.html`: the page shell.
-- `assets/app.js`: the reader (hash routing, search, record pages).
+- `content/start.json`, `content/leveling.json`, `content/builds.json`, `content/links.json`: the hand-written Russian pages.
+- `assets/app.js`: the whole front end (hash routing, content pages, builds, class pages, skill tree planner, XP charts).
 - `assets/style.css`: the look.
 - `og.jpg`: link preview image, 1200×630.
 - `data/<section>.json`: list of records for each section; `data/<section>/<n>.json`: full records, split into shards by `crc32(id) % shards`.
@@ -70,6 +65,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
+| 2026-10-19 | New direction: a Russian-language site for the party. New pages Где качать, Прокачка, Билды (8 classes, planner links) and Ссылки; texts in `content/`. Classes, skill trees and XP translated. Raw database removed from the menu. | draft |
 | 2026-10-08 | Contributor guide (`AGENTS.md`) for people and AI assistants; all extractors in `tools/` with a one-command rebuild (`build_all.sh`) and a check against in-game tooltips. Loot data now shows names of curves and items in place of raw ids (loot section is still locked). | published |
 | 2026-10-08 | Skill tree planner in the game's look (learn, Respec, shareable build link). Only Classes, Skill trees and Experience are open; other sections show as coming soon. Work-in-progress note on the home page. | published |
 | 2026-10-08 | Skill trees in the in-game panel style: archetype, weapon and stamina trees with the game's own backgrounds and node frames, unlock arrows, point costs and tooltips. | published |

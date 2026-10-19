@@ -1,0 +1,79 @@
+{
+  "title": "Где качать и как зайти",
+  "lede": "Официальные серверы закрыты с февраля 2026. Сейчас играем на фанатском сервере Evolve. Нужен свой клиент из Steam и лаунчер Evolve Companion.",
+  "updated": "2026-10-19",
+  "blocks": [
+    {
+      "h": "Коротко",
+      "list": [
+        "Клиент игры берём только из своей библиотеки Steam. Купить игру сейчас нельзя: её сняли с продажи 2 февраля 2026.",
+        "Сервер — **Evolve Community Server** от Spectre Games. Это фанатский проект, не Intrepid.",
+        "Идёт ранний плейтест: персонажей могут стереть в любой момент, прогресс не переносится."
+      ]
+    },
+    {
+      "h": "1. Клиент игры",
+      "steps": [
+        "Открой Steam → Библиотека → Ashes of Creation → Установить. Если Steam открыт, можно нажать [установить через Steam](steam://install/4124950).",
+        "Места нужно много: у нас установка заняла около 150 ГБ.",
+        "Запомни папку игры, она понадобится в Companion. Например: `D:\\SteamLibrary\\steamapps\\common\\Ashes of Creation`."
+      ],
+      "note": "Клиент больше нигде не берём и никому не раздаём. Правила Evolve запрещают выкладывать, просить и предлагать файлы игры."
+    },
+    {
+      "h": "2. Аккаунт Evolve",
+      "steps": [
+        "Зарегистрируйся на [aocevolve.com/account/register](https://aocevolve.com/account/register/) и подтверди аккаунт.",
+        "По желанию включи аутентификатор в [настройках безопасности](https://aocevolve.com/account/security/). Там же видно, на каких устройствах вошёл Companion.",
+        "Один человек — один аккаунт. Дубликаты проверяют; если играете с одного компьютера или из одной квартиры, это решают через поддержку."
+      ]
+    },
+    {
+      "h": "3. Лаунчер Evolve Companion",
+      "steps": [
+        "Скачай с официальной страницы [aocevolve.com/download](https://aocevolve.com/download/). Других источников не используем.",
+        "**Windows 10/11:** запусти `EvolveCompanionSetup.exe`. Ставится только для твоей учётной записи, права администратора не нужны.",
+        "Если Windows пишет «Система Windows защитила ваш компьютер»: нажми «Подробнее», проверь издателя и только потом «Выполнить в любом случае».",
+        "**Linux:** файл `EvolveCompanion-linux-amd64`, затем `chmod +x EvolveCompanion-linux-amd64 && ./EvolveCompanion-linux-amd64`. Игру он запускает через Proton, umu-launcher или Wine. Windows-версию Companion под Wine не запускать.",
+        "Companion не обновляется сам. Вышла новая версия — закрой его и поставь поверх, вход и настройки сохранятся."
+      ]
+    },
+    {
+      "h": "4. Первый запуск",
+      "steps": [
+        "Открой Companion и нажми **Sign in**. Откроется браузер: войди там. Пароль Companion не видит, он получает одноразовый билет на вход.",
+        "В **Settings** укажи папку игры из шага 1.",
+        "Нажимай **Play в Companion**, не в Steam. Companion сам запустит игру и подключит к серверу."
+      ]
+    },
+    {
+      "h": "Что важно знать",
+      "list": [
+        "Сервер не копия Early Access. Evolve меняет баланс, добавляет квесты, торговцев и системы. Гайды из прошлого могут местами не совпадать.",
+        "Когда тесты станут стабильными, обещают постоянный сервер с нуля и бэкапами.",
+        "Баги и новости — в [Discord Evolve](https://discord.gg/bkVYBbe2sP). Обещают также Linux и macOS, современный клиент и рендер."
+      ]
+    },
+    {
+      "h": "Проверка установщика",
+      "p": [
+        "Мы проверяли Companion 7 октября 2026 (версия 2.0.0): 0 срабатываний из 71 на VirusTotal, подпись действительна, © Spectre Games LLC. Новая версия будет с другим хэшем — тогда смотри на подпись."
+      ],
+      "table": {
+        "head": ["Файл", "SHA-256 (версия 2.0.0)"],
+        "rows": [
+          ["`EvolveCompanionSetup.exe`", "`0976b235cfd46becda7719724bc54f8aa1f787babc1ac32b39a89f9f73412b6e`"],
+          ["`EvolveCompanion.exe`", "`c99a366d0122f950bda4be0be382dbe037d2df366a5fec04dc61df07740396f7`"]
+        ]
+      },
+      "after": ["Проверить свой файл: в PowerShell `Get-FileHash .\\EvolveCompanionSetup.exe`."]
+    }
+  ],
+  "sources": [
+    ["Evolve: FAQ", "https://aocevolve.com/faq/"],
+    ["Evolve: Download", "https://aocevolve.com/download/"],
+    ["Evolve: Roadmap", "https://aocevolve.com/roadmap/"],
+    ["Evolve: The project", "https://aocevolve.com/project/"],
+    ["GameFragger, 17.10.2026: Ashes of Creation снова играбельна", "https://gamefragger.com/multiplatform/massively-multiplayer/ashes-of-creation-is-playable-again-months-after-intrepid-studios-shut-down-thanks-to-a-fan-server-a29891"]
+  ]
+}

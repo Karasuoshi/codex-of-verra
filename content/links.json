@@ -1,0 +1,53 @@
+{
+  "title": "Полезные ссылки",
+  "lede": "Другие проекты по Ashes of Creation: где играть, гайды, базы и калькуляторы, разработка серверов, новости. Многие из них серьёзнее и полнее нашего сайта — пользуйтесь.",
+  "updated": "2026-10-19",
+  "groups": [
+    {
+      "h": "Где играть",
+      "items": [
+        { "name": "Evolve Community Server", "url": "https://aocevolve.com/", "what": "Фанатский сервер от Spectre Games (ведут SWG: Evolve). Сейчас ранний плейтест, возможны вайпы.", "status": "работает" },
+        { "name": "Evolve: скачать Companion", "url": "https://aocevolve.com/download/", "what": "Официальная страница лаунчера для Windows и Linux. Как поставить — в разделе [Где качать](#/start)." },
+        { "name": "Evolve: FAQ", "url": "https://aocevolve.com/faq/", "what": "Правила, требования, как подключиться." },
+        { "name": "Evolve: Roadmap", "url": "https://aocevolve.com/roadmap/", "what": "Этапы проекта: что готово, что в работе." },
+        { "name": "Discord Evolve", "url": "https://discord.gg/bkVYBbe2sP", "what": "Новости, баги, поддержка." }
+      ]
+    },
+    {
+      "h": "Гайды и билды",
+      "items": [
+        { "name": "MetaBattle: AoC Builds", "url": "https://metabattle.com/aoc/Ashes_of_Creation_Builds", "what": "Билды всех классов для прокачки, PvE и PvP с ротациями. Основа нашего раздела [Билды](#/builds).", "status": "патч 28.01.2026" },
+        { "name": "MetaBattle: Leveling Guide", "url": "https://metabattle.com/aoc/Ashes_of_Creation_Leveling_Guide", "what": "Где качаться соло и группой по уровням." },
+        { "name": "GGWTB: Leveling Guide 1–25", "url": "https://ggwtb.com/blog/ashes-of-creation-leveling-guide-1-25-fast-core-route---best-alternate-spots", "what": "Подробный маршрут прокачки с запасными местами.", "status": "31.12.2025" },
+        { "name": "GamerBlurb: How to Level", "url": "https://gamerblurb.com/articles/ashes-of-creation-how-to-level", "what": "Общие советы по опыту, группе, оружию и ремеслу." },
+        { "name": "Windows Report: Artisan Classes and Professions", "url": "https://windowsreport.com/ashes-of-creation-early-access-artisan-classes-and-professions-explained/", "what": "Как устроены профессии и сертификаты." }
+      ]
+    },
+    {
+      "h": "Базы, калькуляторы, вики",
+      "items": [
+        { "name": "The Armory (aocarmory.com)", "url": "https://aocarmory.com/talents", "what": "Калькулятор талантов и деревьев навыков. Много полезного для планирования билдов." },
+        { "name": "Ashes of Creation Wiki", "url": "https://ashesofcreation.wiki/", "what": "Большая вики сообщества: мир, системы, классы, ремесло." },
+        { "name": "fomo DB", "url": "https://fomodb.pages.dev/", "what": "База косметики: питомцы, маунты, костюмы, наборы." },
+        { "name": "AshesCodex", "url": "https://ashescodex.com/", "what": "Была главная база игры с картой и планировщиком.", "status": "закрыт" },
+        { "name": "CodexScraper", "url": "https://github.com/Mutim/CodexScraper", "what": "Инструмент, который выгружал данные AshesCodex в свою базу (Supabase)." }
+      ]
+    },
+    {
+      "h": "Разработка серверов",
+      "items": [
+        { "name": "AoC-RiseOfPhoenix", "url": "https://github.com/Bearusx/AoC-RiseOfPhoenix", "what": "Открытый эмулятор сервера (C++). Пока только вход, выбор персонажа и загрузка мира: боя, NPC и квестов нет. Это для разработчиков, не для игры." },
+        { "name": "Codex of Verra на GitHub", "url": "https://github.com/Karasuoshi/codex-of-verra", "what": "Этот сайт и наши инструменты разбора данных клиента. Описание для помощников — в AGENTS.md." }
+      ]
+    },
+    {
+      "h": "Новости",
+      "items": [
+        { "name": "GameFragger: игра снова играбельна", "url": "https://gamefragger.com/multiplatform/massively-multiplayer/ashes-of-creation-is-playable-again-months-after-intrepid-studios-shut-down-thanks-to-a-fan-server-a29891", "what": "Статья про Evolve: как зайти и какие ограничения.", "status": "17.10.2026" },
+        { "name": "Ashes Moments", "url": "https://ashesmoments.substack.com/", "what": "Рассылка и новости по игре: билды, ротации, разборы." },
+        { "name": "Wikipedia: Ashes of Creation", "url": "https://en.wikipedia.org/wiki/Ashes_of_Creation", "what": "История игры." }
+      ]
+    }
+  ],
+  "add": "Нашли ещё полезный проект — скиньте ссылку, добавим. Список лежит в файле content/links.json."
+}
