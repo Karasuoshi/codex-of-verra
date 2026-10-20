@@ -1,0 +1,298 @@
+{
+  "id": "bard-cryptward",
+  "title": "Бард: путь до полного Cryptward",
+  "lede": "От прокачки 20→25 до полного сета 26 в Epic. Тяжёлая магическая броня, PvP, сила на урон и хил. Всё фармится в одном регионе — Jundark.",
+  "tags": [
+    "PvP",
+    "Сила: урон + хил",
+    "Тяжёлая броня",
+    "Регион: Jundark",
+    "Цель: Epic"
+  ],
+  "updated": "2026-10-20",
+  "stages": [
+    {
+      "n": 1,
+      "levels": "20 → 25",
+      "title": "Прокачка в Jundark",
+      "where": "Джунгли, элитные мили-мобы 22–29 уровня. С них падает тяжёлая броня и всё для крафта.",
+      "drops": [
+        {
+          "ic": "icons/Items/Gear/Armor/Heavy/Chest/TUI_Icon_Gear_Armor_Heavy_Chest_2ndSword0.webp",
+          "name": "Graveplate",
+          "note": "броня 23, с элиток"
+        },
+        {
+          "ic": "icons/Items/Gear/Weapon/Mace/2H/TUI_Icon_Gear_Weapons_Mace_2H_Novice.webp",
+          "name": "Shadowfang",
+          "note": "оружие 23"
+        },
+        {
+          "ic": "icons/Resource/Raw/TUI_Icon_Resource_Reagent_Biome_Jundark.webp",
+          "name": "Jundark Essence",
+          "note": "~6,2% за убийство"
+        },
+        {
+          "ic": "icons/Items/Consumable/Recipe/TUI_Icon_Consumable_Recipe.webp",
+          "name": "Рецепты Cryptward",
+          "note": "любой рецепт брони 26: ~0,17% за убийство"
+        }
+      ],
+      "wear": "Одеваешься в Graveplate (Force, тяжёлый) и Shadowfang Nightglass Great Mace или Murkline Shortbow.",
+      "farm": []
+    },
+    {
+      "n": 2,
+      "levels": "25",
+      "title": "Копим на крафт",
+      "where": "Тот же Jundark. Всё складываем в общий склад ноды, гейджи покупаем у торговцев.",
+      "drops": [
+        {
+          "ic": "icons/Resource/Raw/TUI_Icon_Resource_Reagent_Biome_Jundark.webp",
+          "name": "244 Jundark Essence",
+          "note": "149 броня + 45 булава + 50 лук"
+        },
+        {
+          "ic": "icons/Items/Consumable/Recipe/TUI_Icon_Consumable_Recipe.webp",
+          "name": "7 рецептов Cryptward",
+          "note": "параллельно с эссенцией"
+        },
+        {
+          "ic": "icons/Resource/Processed/TUI_Icon_Resource_Processed_ArmorPlating_Zinc.webp",
+          "name": "259 Zinc Armor Plating",
+          "note": "Mining → Metalworking"
+        },
+        {
+          "ic": "icons/Resource/Raw/TUI_Icon_Resource_Reagent_Heavy_Chest.webp",
+          "name": "Metal Gauges",
+          "note": "у торговца"
+        }
+      ],
+      "wear": "Рецепты оружия выбивать долго (~1 на 17 000 убийств) — меняем или покупаем у игроков.",
+      "farm": [
+        {
+          "label": "244 Jundark Essence",
+          "kills": 3900
+        },
+        {
+          "label": "7 рецептов Cryptward",
+          "kills": 7000
+        }
+      ]
+    },
+    {
+      "n": 3,
+      "levels": "25",
+      "title": "Крафт Epic",
+      "where": "Нужны мастерские в ноде: кузница (Armorsmithing и Weaponsmithing, 1-е расширение) и столярка (Carpentry Factory).",
+      "drops": [
+        {
+          "ic": "icons/Items/Gear/Armor/Heavy/Chest/TUI_Icon_Gear_Armor_Heavy_Chest_2ndSword0.webp",
+          "name": "7× Cryptward",
+          "note": "Armor Smithing"
+        },
+        {
+          "ic": "icons/Items/Gear/Weapon/Mace/2H/TUI_Icon_Gear_Weapons_Mace_2H_Anvil.webp",
+          "name": "Veilbound Great Mace",
+          "note": "Weapon Smithing"
+        },
+        {
+          "ic": "icons/Items/Gear/Weapon/Shortbow/2H/TUI_Icon_Gear_Weapons_Shortbow_2H_Anvils.webp",
+          "name": "Gloomstring Shortbow",
+          "note": "Carpentry"
+        }
+      ],
+      "wear": "Epic не гарантирован: редкость зависит от качества крафта.",
+      "farm": []
+    }
+  ],
+  "paperdoll": [
+    {
+      "slot": "Голова",
+      "name": "Cryptward Helm",
+      "set": "cw",
+      "ic": "icons/Items/Gear/Armor/Heavy/Head/TUI_Icon_Gear_Armor_Heavy_2ndSwordDivision_Head.webp",
+      "stats": "Маг. сила 328–350 · Mentality 328–350 · Wisdom 59–63"
+    },
+    {
+      "slot": "Плечи",
+      "name": "Cryptward Pauldrons",
+      "set": "cw",
+      "ic": "icons/Items/Gear/Armor/Heavy/Shoulders/TUI_Icon_Gear_Armor_Heavy_2ndSwordDivision_Shoulders.webp",
+      "stats": "Маг. сила 241–257 · Con 251–268 · Точность контроля 241–257"
+    },
+    {
+      "slot": "Грудь",
+      "name": "Cryptward Cuirass",
+      "set": "cw",
+      "ic": "icons/Items/Gear/Armor/Heavy/Chest/TUI_Icon_Gear_Armor_Heavy_Chest_2ndSword0.webp",
+      "stats": "Маг. сила 321–343 · Con 335–357 · Точность 321–343 · Мана 321–343"
+    },
+    {
+      "slot": "Руки",
+      "name": "Cryptward Gloves",
+      "set": "cw",
+      "ic": "icons/Items/Gear/Armor/Heavy/Hands/TUI_Icon_Gear_Armor_Heavy_2ndSwordDivision_Hands.webp",
+      "stats": "Wisdom 251–268 · Здоровье 211–225 · Реген 201–215"
+    },
+    {
+      "slot": "Ноги",
+      "name": "Cryptward Greaves",
+      "set": "cw",
+      "ic": "icons/Items/Gear/Armor/Heavy/Legs/TUI_Icon_Gear_Armor_Heavy_Legs_2ndSword.webp",
+      "stats": "Сила лечения 428–457 · Mentality 375–400 · Защита от критов 428–457"
+    },
+    {
+      "slot": "Ступни",
+      "name": "Cryptward Sabatons",
+      "set": "cw",
+      "ic": "icons/Items/Gear/Armor/Heavy/Feet/TUI_Icon_Gear_Armor_Heavy_Feet_2ndSword.webp",
+      "stats": "Точность контроля 402–429 · Уклонение от магии 121–129"
+    },
+    {
+      "slot": "Плащ",
+      "name": "Cryptward Cape",
+      "set": "cw",
+      "ic": "icons/Items/Gear/Armor/Heavy/Back/TUI_Icon_Gear_Armor_Heavy_Back_AshenHaunt1.webp",
+      "stats": "Здоровье 903–964 · Уклонение 402–429"
+    },
+    {
+      "slot": "Предплечья",
+      "name": "Graveplate Bracers",
+      "set": "gp",
+      "ic": "icons/Items/Gear/Armor/Heavy/Forearms/TUI_Icon_Gear_Armor_Heavy_Forearms_2ndSword.webp",
+      "stats": "С этапа 1: бонус сета уже набран 7 вещами"
+    },
+    {
+      "slot": "Пояс",
+      "name": "Graveplate Faulds",
+      "set": "gp",
+      "ic": "icons/Items/Gear/Armor/Heavy/Waist/TUI_Icon_Gear_Armor_Heavy_Waist_2ndSword.webp",
+      "stats": "С этапа 1: бонус сета уже набран 7 вещами"
+    }
+  ],
+  "weapons": [
+    {
+      "slot": "Основное",
+      "name": "Nightreaver Veilbound Great Mace",
+      "ic": "icons/Items/Gear/Weapon/Mace/2H/TUI_Icon_Gear_Weapons_Mace_2H_Anvil.webp",
+      "stats": "Маг. сила 4684–4997 · Int 353–377 · Wisdom 126–134 · Маг. точность 703–750 · Шанс маг. крита 517–552"
+    },
+    {
+      "slot": "Второе",
+      "name": "Nightreaver Gloomstring Shortbow",
+      "ic": "icons/Items/Gear/Weapon/Shortbow/2H/TUI_Icon_Gear_Weapons_Shortbow_2H_Anvils.webp",
+      "stats": "Маг. сила 3902–4163 · Скорость каста 1299–1386 · Int 353–377 · Сила крита лечения 703–750 · Мана 602–643"
+    }
+  ],
+  "setbonus": [
+    {
+      "pcs": 2,
+      "text": "Constitution +138"
+    },
+    {
+      "pcs": 4,
+      "text": "Wisdom +173"
+    },
+    {
+      "pcs": 6,
+      "text": "Реген здоровья +826"
+    },
+    {
+      "pcs": 7,
+      "text": "Скорость каста +826"
+    }
+  ],
+  "typebonus": [
+    {
+      "pcs": "5+ тяжёлых",
+      "text": "+14% к снижению физ. урона"
+    },
+    {
+      "pcs": "5+ Finesse",
+      "text": "+24% к Wisdom и Dexterity"
+    }
+  ],
+  "final": [
+    {
+      "label": "Маг. сила",
+      "value": "~5950",
+      "note": "броня 950 + булава 4997"
+    },
+    {
+      "label": "Wisdom",
+      "value": "~680",
+      "note": "+24% от Finesse"
+    },
+    {
+      "label": "Сила лечения",
+      "value": "457"
+    },
+    {
+      "label": "Точность контроля",
+      "value": "686"
+    },
+    {
+      "label": "Маг. точность",
+      "value": "750"
+    },
+    {
+      "label": "Скорость каста",
+      "value": "+826"
+    },
+    {
+      "label": "Constitution",
+      "value": "~760"
+    },
+    {
+      "label": "Mentality",
+      "value": "~840"
+    },
+    {
+      "label": "Снижение физ. урона",
+      "value": "+14%"
+    }
+  ],
+  "chain": [
+    {
+      "who": "1",
+      "gather": "Mining",
+      "process": "Metalworking",
+      "craft": "—",
+      "makes": "Zinc Armor Plating, Zinc Ingot"
+    },
+    {
+      "who": "2",
+      "gather": "—",
+      "process": "Stonemasonry (Apprentice)",
+      "craft": "Armor Smithing",
+      "makes": "7× Cryptward"
+    },
+    {
+      "who": "3",
+      "gather": "—",
+      "process": "—",
+      "craft": "Weapon Smithing",
+      "makes": "Veilbound Great Mace"
+    },
+    {
+      "who": "4",
+      "gather": "Lumberjacking",
+      "process": "Lumber Milling",
+      "craft": "Carpentry",
+      "makes": "Gloomstring Shortbow"
+    },
+    {
+      "who": "5",
+      "gather": "Herbalism, Hunting",
+      "process": "Weaving, Tanning",
+      "craft": "—",
+      "makes": "ткань и шкуры по мелочи"
+    }
+  ],
+  "notes": [
+    "Цифры — из данных клиента Early Access (январь 2026), значения Epic. Evolve может что-то менять.",
+    "Убийства — элитки 20–29 уровня, разница уровней с мобом до 9. Делится ли лут в пати — проверить в игре.",
+    "Пати из 8 при ~400 убийствах в час: этапы 2–3 занимают примерно 15–20 часов фарма."
+  ]
+}
