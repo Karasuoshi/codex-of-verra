@@ -254,7 +254,7 @@
             h("ul", null, P.setbonus.map((b) => h("li", null, pips(b.pcs), h("span", { class: "b-pcs" }, b.pcs + " шт."), h("span", null, b.text))))),
           h("div", { class: "bonus" }, h("h3", null, "Бонус типа брони"),
             h("ul", null, P.typebonus.map((b) => h("li", null, h("span", { class: "b-pcs wide" }, b.pcs), h("span", null, b.text))))))),
-      h("h2", { class: "home-h" }, "Что получится (с булавой)"),
+      h("h2", { class: "home-h" }, "Что получится"),
       h("ul", { class: "stat-tiles" }, P.final.map((f) => h("li", null, h("span", { class: "st-v" }, f.value), h("span", { class: "st-l" }, f.label), f.note ? h("small", null, f.note) : null))),
       h("h2", { class: "home-h" }, "Кто что качает в пати"),
       table(["#", "Сбор", "Переработка", "Крафт", "Делает"], P.chain.map((c) => [c.who, c.gather, c.process, c.craft, c.makes])),
