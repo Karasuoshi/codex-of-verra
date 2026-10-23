@@ -41,7 +41,7 @@
     return cache.get(path);
   }
   // Routes that exist on the site. Anything else (the old raw database under db/) is rendered as plain text.
-  const OPEN = /^(|start|leveling|builds(\/.*)?|links|classes(\/.*)?|skills(\/.*)?|xp(\/.*)?|improvements(\/.*)?)$/;
+  const OPEN = /^(|start|leveling|builds(\/.*)?|paths(\/.*)?|links|classes(\/.*)?|skills(\/.*)?|xp(\/.*)?|improvements(\/.*)?)$/;
   const isOpen = (to) => OPEN.test(String(to).split("?")[0]);
   const link = (to, text, cls) => isOpen(to) ? h("a", { href: "#/" + to, class: cls }, text)
     : h("span", { class: "locked" + (cls ? " " + cls : "") }, text);
@@ -210,6 +210,55 @@
           h("span", { class: "lc-host" }, it.url.replace(/^https?:\/\//, "").replace(/\/$/, "")),
           h("p", null, rich(it.what))))))),
       D.add ? h("p", { class: "doc-note" }, rich(D.add)) : null);
+  }
+
+  // ——— gear paths (content/paths/<id>.json): stages, final set, stats, crafters ———
+  async function pagePath(id) {
+    if (!id) {
+      const L = await load("content/paths/index.json");
+      return setPage(L.title, h("p", { class: "crumbs" }, link("", "Главная")), h("h1", null, L.title), h("p", { class: "lede small" }, rich(L.lede)),
+        h("ul", { class: "cards" }, L.paths.map((p) => homeCard("paths/" + p.id, p.title, p.cls, p.blurb))));
+    }
+    const P = await load("content/paths/" + id + ".json");
+    const maxKills = Math.max(1, ...P.stages.flatMap((st) => (st.farm || []).map((f) => f.kills)));
+    const item = (d) => h("li", { class: "pi" }, icon(d.ic, "pi-ic"), h("span", { class: "pi-txt" }, h("b", null, d.name), d.note ? h("small", null, rich(d.note)) : null));
+    const stage = (st) => h("li", { class: "ps" },
+      h("div", { class: "ps-head" }, h("span", { class: "ps-n" }, st.n), h("div", null, h("span", { class: "ps-lv" }, "Уровень " + st.levels), h("h3", null, st.title))),
+      h("p", { class: "ps-where" }, rich(st.where)),
+      h("ul", { class: "pi-list" }, st.drops.map(item)),
+      (st.farm || []).length ? h("div", { class: "farm" }, st.farm.map((f) => h("div", { class: "farm-row" },
+        h("span", { class: "farm-l" }, f.label), h("span", { class: "farm-v" }, "~" + fmt(f.kills) + " убийств"),
+        h("span", { class: "farm-bar" }, h("i", { style: "width:" + (100 * f.kills / maxKills).toFixed(1) + "%" }))))) : null,
+      st.wear ? h("p", { class: "ps-wear" }, rich(st.wear)) : null);
+    const slot = (d, big) => h("li", { class: "gs" + (big ? " big" : "") + (d.set ? " set-" + d.set : "") },
+      h("span", { class: "gs-frame" }, icon(d.ic, "gs-ic")),
+      h("span", { class: "gs-txt" }, h("span", { class: "gs-slot" }, d.slot, d.set === "gp" ? h("span", { class: "tag" }, "23") : h("span", { class: "tag epic" }, "26 · Epic")),
+        h("b", { class: "gs-name" }, d.name), h("small", null, d.stats)));
+    const pips = (n) => h("span", { class: "pips", "aria-label": n + " из 7" }, [1, 2, 3, 4, 5, 6, 7].map((i) => h("i", { class: i <= n ? "on" : null })));
+    setPage(P.title,
+      h("p", { class: "crumbs" }, link("", "Главная"), " / ", link("paths", "Путь шмота")),
+      h("section", { class: "path-hero" },
+        h("p", { class: "hero-kicker" }, "Путь шмота"),
+        h("h1", null, P.title),
+        h("p", { class: "lede small" }, rich(P.lede)),
+        h("ul", { class: "chips" }, P.tags.map((t) => h("li", null, t)))),
+      updated(P.updated),
+      h("h2", { class: "home-h" }, "Этапы"),
+      h("ol", { class: "path-stages" }, P.stages.map(stage)),
+      h("h2", { class: "home-h" }, "Итоговый комплект"),
+      h("div", { class: "kit" },
+        h("ul", { class: "kit-armor" }, P.paperdoll.map((d) => slot(d))),
+        h("div", { class: "kit-side" },
+          h("ul", { class: "kit-weapons" }, P.weapons.map((d) => slot(d, true))),
+          h("div", { class: "bonus" }, h("h3", null, "Бонус сета Cryptward"),
+            h("ul", null, P.setbonus.map((b) => h("li", null, pips(b.pcs), h("span", { class: "b-pcs" }, b.pcs + " шт."), h("span", null, b.text))))),
+          h("div", { class: "bonus" }, h("h3", null, "Бонус типа брони"),
+            h("ul", null, P.typebonus.map((b) => h("li", null, h("span", { class: "b-pcs wide" }, b.pcs), h("span", null, b.text))))))),
+      h("h2", { class: "home-h" }, "Что получится"),
+      h("ul", { class: "stat-tiles" }, P.final.map((f) => h("li", null, h("span", { class: "st-v" }, f.value), h("span", { class: "st-l" }, f.label), f.note ? h("small", null, f.note) : null))),
+      h("h2", { class: "home-h" }, "Кто что качает в пати"),
+      table(["#", "Сбор", "Переработка", "Крафт", "Делает"], P.chain.map((c) => [c.who, c.gather, c.process, c.craft, c.makes])),
+      P.notes ? h("ul", { class: "doc-list path-notes" }, P.notes.map((t) => h("li", null, rich(t)))) : null);
   }
 
   // ——— builds ———
@@ -661,6 +710,7 @@
       else if (parts[0] === "start" || parts[0] === "leveling") await pageDoc(parts[0]);
       else if (parts[0] === "builds") await pageBuilds(parts[1]);
       else if (parts[0] === "links") await pageLinks();
+      else if (parts[0] === "paths") await pagePath(parts[1]);
       else if (parts[0] === "search" || parts[0] === "db") pageGone();
       else if (parts[0] === "improvements") pageImprovements(parts[1]);
       else if (parts[0] === "xp") await pageXp(parts[1]);
