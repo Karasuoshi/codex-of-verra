@@ -65,6 +65,7 @@ Settings → Pages → Deploy from a branch → `main` / `(root)`. `.nojekyll` i
 ## Changelog
 | Date | Change | Status |
 |---|---|---|
+| 2026-10-23 | Gear path page `#/paths/bard-cryptward`: bard route to full Cryptward 26 (Epic), mace and shortbow, set bonuses, crafters. Character-sheet Mag Power = rating / 45, item values checked against an in-game tooltip (`docs/samples/gear_tooltips.tsv`). Not in the menu yet. | published |
 | 2026-10-19 | New direction: a Russian-language site for the party. New pages Где качать, Прокачка, Билды (8 classes, planner links) and Ссылки; texts in `content/`. Classes, skill trees and XP translated. Raw database removed from the menu. | published |
 | 2026-10-08 | Contributor guide (`AGENTS.md`) for people and AI assistants; all extractors in `tools/` with a one-command rebuild (`build_all.sh`) and a check against in-game tooltips. Loot data now shows names of curves and items in place of raw ids (loot section is still locked). | published |
 | 2026-10-08 | Skill tree planner in the game's look (learn, Respec, shareable build link). Only Classes, Skill trees and Experience are open; other sections show as coming soon. Work-in-progress note on the home page. | published |
